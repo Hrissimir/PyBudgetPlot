@@ -390,6 +390,11 @@ spelling-store-unknown-words=no
 
 [IMPORTS]
 
+# List of modules that can be imported at any level, not just the top level
+# one.
+allow-any-import-level=__about__,
+                       __version__
+
 # Deprecated modules which should not be used, separated by a comma
 deprecated-modules=regsub,
                    TERMIOS,
