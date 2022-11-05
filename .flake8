@@ -21,12 +21,13 @@ exclude =
     htmlcov,
     old
 filename = *.py
-ignore = D100,D103,D104,E121,E123,E126,E203,E226,E24,E704,Q000,W503,W504
+ignore = D100,D103,D104,D202,D412,E121,E123,E126,E203,E226,E24,E704,Q000,W503,W504
 per-file-ignores =
     # imported but unused
     __init__.py: F401
     __about__.py: F401
     setup.py:E121
+    test_*.py: D102
 max-line-length = 120
 max-doc-length = 120
 indent-size = 4
