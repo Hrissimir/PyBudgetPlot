@@ -185,5 +185,5 @@ code-format = [
     "code-check"
 ]
 
-#[[tool.hatch.envs.test.matrix]]
-#python = ["37", "38", "39", "310", "311"]
+[[tool.hatch.envs.test.matrix]]
+python = ["37", "38", "39", "310", "311"]
