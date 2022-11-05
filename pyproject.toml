@@ -167,7 +167,6 @@ dependencies = [
     "flake8-comprehensions>=3.10.0",
     "flake8-docstrings>=1.6.0",
     "flake8-eradicate>=1.4.0",
-    "flake8-quotes>=3.3.1",
 ]
 
 [tool.hatch.envs.default.scripts]
