@@ -1,0 +1,45 @@
+[flake8]
+count = True
+exclude =
+    *.pyc,
+    *.egg,
+    .bzr,
+    .eggs,
+    .git,
+    .github,
+    .hatch,
+    .hg,
+    .nox,
+    .svn,
+    .tox,
+    .venv,
+    __pycache__,
+    CVS,
+    docs/source/conf.py,
+    build,
+    dist,
+    htmlcov,
+    old
+filename = *.py
+ignore = E121,E123,E126,E203,E226,E24,E704,W503,W504
+per-file-ignores =
+    # imported but unused
+    __init__.py: F401
+    __about__.py: F401
+    setup.py:E121
+max-line-length = 120
+max-doc-length = 120
+indent-size = 4
+show-source = True
+extend-immutable-calls =
+    pathlib.Path,
+    Path
+docstring-convention = google
+jobs = 8
+tee = True
+builtins =
+    _,
+    _LE,
+    _LW
+doctests = True
+max-complexity = 15
