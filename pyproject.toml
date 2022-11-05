@@ -1,0 +1,189 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "pybudgetplot"
+description = "Calculates and plots the daily breakdown of a budget definition."
+readme = { "file" = "README.md", "content-type" = "text/markdown" }
+requires-python = ">=3.7"
+license = "MIT"
+keywords = []
+authors = [
+    { name = "Hrissimir", email = "hrisimir.dakov@gmail.com" },
+]
+maintainers = [
+    { name = "Hrissimir", email = "hrisimir.dakov@gmail.com" },
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Education",
+    "Intended Audience :: End Users/Desktop",
+    "Intended Audience :: Financial and Insurance Industry",
+    "Intended Audience :: Information Technology",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+    "Topic :: Office/Business :: Financial",
+    "Topic :: Office/Business :: Financial :: Accounting",
+    "Topic :: Office/Business :: Financial :: Spreadsheet",
+    "Topic :: Utilities",
+]
+dependencies = [
+    "click>=8.1.3",
+    "tabulate>=0.9.0",
+    "pyyaml>=6.0",
+    "pytz>=2022.6",
+    "parsedatetime>=2.6",
+    "python-dateutil>=2.8.2",
+    "recurrent>=0.4.1",
+    "numpy>=1.21.6",
+    "pandas>=1.3.5",
+    "matplotlib>=3.5.3",
+    "xlsxwriter>=3.0.3",
+]
+dynamic = ["version"]
+
+[project.urls]
+Documentation = "https://github.com/Hrissimir/PyBudgetPlot#readme"
+Issues = "https://github.com/Hrissimir/PyBudgetPlot/issues"
+Source = "https://github.com/Hrissimir/PyBudgetPlot"
+
+[project.scripts]
+budget = "pybudgetplot.cli:pybudgetplot"
+
+[tool.black]
+include = '\.pyi?$'
+line-length = 120
+skip-string-normalization = true
+target-version = ["py37"]
+
+[tool.coverage]
+messages = true
+verbose = true
+
+[tool.coverage.run]
+branch = true
+parallel = true
+omit = [
+    "__init__.py",
+    "src/pybudgetplot/__about__.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "no cov",
+    "def __repr__",
+    "if 0:",
+    'if self\.debug',
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "raise AssertionError",
+    "raise NotImplementedError",
+]
+
+[tool.isort]
+default_section = "THIRDPARTY"
+ensure_newline_before_comments = true
+force_grid_wrap = 0
+honor_noqa = true
+include_trailing_comma = true
+known_first_party = ["pybudgetplot"]
+line_length = 120
+multi_line_output = 3
+skip_gitignore = true
+use_parentheses = true
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "--verbose --full-trace --cov-report=term-missing"
+console_output_style = "classic"
+faulthandler_timeout = 180
+filterwarnings = [
+    "error",
+    "ignore::DeprecationWarning",
+    "ignore::FutureWarning",
+    "ignore::UserWarning",
+]
+junit_duration_report = "call"
+junit_family = "xunit2"
+junit_logging = "all"
+junit_log_passing_tests = true
+junit_suite_name = "PyBudgetPlot-Tests"
+log_auto_indent = true
+log_cli = true
+log_cli_date_format = '%Y-%m-%d %H:%M:%S'
+log_cli_format = '%(asctime)s.%(msecs)3d | %(levelname)9s | %(name)s - %(message)s'
+log_cli_level = "DEBUG"
+log_date_format = '%Y-%m-%d %H:%M:%S'
+log_format = '%(asctime)s.%(msecs)3d | %(levelname)9s | %(name)s - %(message)s'
+log_level = "DEBUG"
+norecursedirs = [
+    ".git",
+    ".github",
+    ".hatch",
+    ".pytest_cache",
+    ".tox",
+    ".venv",
+    "build",
+    "dist",
+    "docs",
+    "htmlcov",
+    "site",
+]
+python_files = [
+    "test_*.py",
+    "check_*.py",
+    "example_*.py",
+]
+
+[tool.hatch.version]
+path = "src/pybudgetplot/__about__.py"
+
+[tool.hatch.envs.default]
+dependencies = [
+    "black>=22.10.0",
+    "blacken-docs>=1.12.1",
+    "isort>=5.10.1",
+    "coverage[toml]>=6.2",
+    "pylint>=2.15.5",
+    "pytest>=7.1.3",
+    "pytest-cov>=4.0.0",
+    "twine>=4.0.1",
+    "mccabe>=0.7.0",
+    "pyflakes>=2.5.0",
+    "pycodestyle>=2.9.1",
+    "flake8>=5.0.4",
+    "flake8-bandit>=4.1.1",
+    "flake8-builtins>=2.0.0",
+    "flake8-comprehensions>=3.10.0",
+    "flake8-docstrings>=1.6.0",
+    "flake8-eradicate>=1.4.0",
+    "flake8-quotes>=3.3.1",
+]
+
+[tool.hatch.envs.default.scripts]
+cov = "pytest --cov-config=pyproject.toml --cov=src/pybudgetplot --cov=tests {args}"
+no-cov = "cov --no-cov {args}"
+code-check = [
+    "pylint .",
+    "flake8 --config=.flake8 --require-plugins=mccabe,pyflakes,pycodestyle,flake8-bandit,flake8-builtins,flake8-comprehensions,flake8-docstrings,flake8-eradicate,flake8-quotes ./src ./tests",
+    "black --check --diff ./src ./tests",
+    "isort --check-only --diff ./src ./tests",
+]
+code-format = [
+    "isort ./src ./tests",
+    "black ./src ./tests",
+    "code-check"
+]
+
+#[[tool.hatch.envs.test.matrix]]
+#python = ["37", "38", "39", "310", "311"]
