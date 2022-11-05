@@ -43,3 +43,12 @@ builtins =
     _LW
 doctests = True
 max-complexity = 15
+require-plugins =
+    mccabe,
+    pyflakes,
+    pycodestyle,
+    flake8-bandit,
+    flake8-builtins,
+    flake8-comprehensions,
+    flake8-docstrings,
+    flake8-eradicate
