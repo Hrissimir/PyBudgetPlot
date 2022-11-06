@@ -1,7 +1,7 @@
 """Unit-tests for the `pybudgetplot.model.budget_item` module."""
 from unittest import TestCase
 
-from pybudgetplot.model.budget_item import BudgetItem, new_item, parse_int, parse_string
+from pybudgetplot.model.budget_item import BudgetItem, new_budget_item, parse_int, parse_string
 
 
 class ParseStringTests(TestCase):
@@ -101,5 +101,5 @@ class NewItemTests(TestCase):
         amount_param = "23.5"
         freq_param = "\n \t every day "
         expected = BudgetItem("item desc", 24, "every day")
-        actual = new_item(desc_param, amount_param, freq_param)
+        actual = new_budget_item(desc_param, amount_param, freq_param)
         self.assertEqual(expected, actual)

@@ -66,7 +66,7 @@ class BudgetItem(NamedTuple):
     frequency: str
 
 
-def new_item(description, amount, frequency) -> BudgetItem:
+def new_budget_item(description, amount, frequency) -> BudgetItem:
     """Creates and returns a new BudgetItem instance with the given details.
 
     Validates the params before actually creating the object.
@@ -77,7 +77,15 @@ def new_item(description, amount, frequency) -> BudgetItem:
         frequency: The item's frequency (can't be empty).
     """
 
+    _log.debug(
+        "new_budget_item - description: '%r', amount: '%r', frequency: '%r'",
+        description,
+        amount,
+        frequency
+    )
     description_value = parse_string(description)
     amount_value = parse_int(amount)
     frequency_value = parse_string(frequency)
-    return BudgetItem(description_value, amount_value, frequency_value)
+    item = BudgetItem(description_value, amount_value, frequency_value)
+    _log.info("new_budget_item - created: '%r'", item)
+    return item

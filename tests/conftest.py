@@ -2,9 +2,10 @@
 import logging
 
 KNOWN_LIBRARY_LOGGERS = [
-    "recurrent",
     "matplotlib.font_manager",
+    "parsedatetime",
     "PIL.PngImagePlugin",
+    "recurrent",
 ]
 
 # disable known library loggers that flood the log
