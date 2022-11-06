@@ -58,7 +58,7 @@ Issues = "https://github.com/Hrissimir/PyBudgetPlot/issues"
 Source = "https://github.com/Hrissimir/PyBudgetPlot"
 
 [project.scripts]
-budget = "pybudgetplot.cli:pybudgetplot"
+budget = "pybudgetplot.cli:cli"
 
 [tool.black]
 include = '\.pyi?$'
