@@ -1,11 +1,7 @@
 """This module defines the logic for dealing with single budget-item."""
-import logging
 import re
 from decimal import ROUND_HALF_UP, Decimal
 from typing import NamedTuple
-
-_log = logging.getLogger(__name__)
-_log.addHandler(logging.NullHandler())
 
 
 def parse_string(value) -> str:
@@ -77,15 +73,8 @@ def new_budget_item(description, amount, frequency) -> BudgetItem:
         frequency: The item's frequency (can't be empty).
     """
 
-    _log.debug(
-        "new_budget_item - description: '%r', amount: '%r', frequency: '%r'",
-        description,
-        amount,
-        frequency
-    )
     description_value = parse_string(description)
     amount_value = parse_int(amount)
     frequency_value = parse_string(frequency)
     item = BudgetItem(description_value, amount_value, frequency_value)
-    _log.info("new_budget_item - created: '%r'", item)
     return item

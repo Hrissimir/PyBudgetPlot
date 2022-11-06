@@ -1,5 +1,4 @@
 """This module defines the logic for dealing with budget definitions."""
-import logging
 from io import StringIO
 from typing import List, NamedTuple
 
@@ -7,9 +6,6 @@ import yaml
 
 from pybudgetplot.budget.budget_item import BudgetItem, new_budget_item
 from pybudgetplot.utils.time_util import Period, date_period
-
-_log = logging.getLogger(__name__)
-_log.addHandler(logging.NullHandler())
 
 
 class BudgetDefinition(NamedTuple):
@@ -30,15 +26,8 @@ class BudgetDefinition(NamedTuple):
             The newly created BudgetItem instance after adding it to the list.
         """
 
-        _log.debug(
-            "add_item - description: '%r', amount: '%r', frequency: '%r'",
-            description,
-            amount,
-            frequency
-        )
         item = new_budget_item(description, amount, frequency)
         self.items.append(item)
-        _log.info("add_item - added: %s", item)
         return item
 
 
@@ -53,15 +42,9 @@ def new_budget(period_start, period_end) -> BudgetDefinition:
         New BudgetDefinition instance for the period, with empty list of items.
     """
 
-    _log.debug(
-        "new_budget - period_start: '%r', period_end: '%r'",
-        period_start,
-        period_end
-    )
     period = date_period(period_start, period_end)
     items = []
     budget = BudgetDefinition(period, items)
-    _log.info("new_budget - created: %r", budget)
     return budget
 
 
