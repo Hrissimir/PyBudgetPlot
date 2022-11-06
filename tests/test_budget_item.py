@@ -1,7 +1,7 @@
 """Unit-tests for the `pybudgetplot.model.budget_item` module."""
 from unittest import TestCase
 
-from pybudgetplot.model.budget_item import BudgetItem, new_budget_item, parse_int, parse_string
+from pybudgetplot.budget.budget_item import BudgetItem, new_budget_item, parse_int, parse_string
 
 
 class ParseStringTests(TestCase):

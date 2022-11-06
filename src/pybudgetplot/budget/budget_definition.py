@@ -4,9 +4,8 @@ from io import StringIO
 from typing import List, NamedTuple
 
 import yaml
-from pandas import DataFrame, DatetimeIndex, Series, concat, date_range
 
-from pybudgetplot.model.budget_item import BudgetItem, new_budget_item
+from pybudgetplot.budget.budget_item import BudgetItem, new_budget_item
 from pybudgetplot.utils.time_util import Period, date_period
 
 _log = logging.getLogger(__name__)
@@ -43,7 +42,7 @@ class BudgetDefinition(NamedTuple):
         return item
 
 
-def new_budget_definition(period_start, period_end) -> BudgetDefinition:
+def new_budget(period_start, period_end) -> BudgetDefinition:
     """Creates and returns a new budget definition for the given period.
 
     Args:
@@ -55,14 +54,14 @@ def new_budget_definition(period_start, period_end) -> BudgetDefinition:
     """
 
     _log.debug(
-        "new_budget_definition - period_start: '%r', period_end: '%r'",
+        "new_budget - period_start: '%r', period_end: '%r'",
         period_start,
         period_end
     )
     period = date_period(period_start, period_end)
     items = []
     budget = BudgetDefinition(period, items)
-    _log.info("new_budget_definition - created: %r", budget)
+    _log.info("new_budget - created: %r", budget)
     return budget
 
 
@@ -117,7 +116,7 @@ def budget_from_dict(budget_data: dict) -> BudgetDefinition:
     period_data = budget_data["PERIOD"]
     period_start = period_data["start"]
     period_end = period_data["end"]
-    budget = new_budget_definition(period_start, period_end)
+    budget = new_budget(period_start, period_end)
 
     items_data = budget_data["ITEMS"]
     for item_description, item_details in items_data.items():
@@ -134,31 +133,3 @@ def budget_from_yaml(text) -> BudgetDefinition:
     buffer = StringIO(text)
     budget_data = yaml.load(buffer, Loader=yaml.SafeLoader)
     return budget_from_dict(budget_data)
-
-
-def calculate_budget_breakdown(budget: BudgetDefinition) -> DataFrame:
-    """Calculates the breakdown of the budget's "daily" and "cumulative" totals.
-
-    Args:
-        budget: Budget definition.
-
-    Returns:
-        DataFrame with the breakdown values.
-    """
-
-    breakdown_data = DataFrame(
-        index=date_range(budget.period.start, budget.period.end)
-    )
-
-    for item in budget.items:
-        item_dates = budget.period.generate_dates(item.frequency)
-        item_data = DataFrame(
-            data={item.description: item.amount},
-            index=DatetimeIndex(Series(item_dates, dtype=object))
-        )
-        breakdown_data = concat([breakdown_data, item_data], axis=1).fillna(0)
-
-    breakdown_data["daily_total"] = breakdown_data.sum(axis=1)
-    breakdown_data["cumulative_total"] = breakdown_data["daily_total"].cumsum()
-    breakdown_data.index.rename("date", True)
-    return breakdown_data
