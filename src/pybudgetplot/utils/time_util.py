@@ -165,3 +165,11 @@ class Period(NamedTuple):
         """
 
         return generate_date_stamps(frequency, self.start, self.end)
+
+
+def date_period(start, end) -> Period:
+    """Creates and returns Period instance initialized with date-stamps."""
+
+    period_start = parse_date_stamp(start)
+    period_end = parse_date_stamp(end)
+    return Period(period_start, period_end)

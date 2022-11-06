@@ -6,6 +6,7 @@ from pandas import Timestamp
 
 from pybudgetplot.utils.time_util import (
     Period,
+    date_period,
     generate_date_stamps,
     is_normalized,
     parse_date_stamp,
@@ -242,3 +243,17 @@ class PeriodTests(TestCase):
 
         self.assertIs(expected_result, actual_result)
         mock_generate_stamps.assert_called_once_with(freq, start, end)
+
+
+class DatePeriodTests(TestCase):
+    """Unit-tests for the `time_util.date_period` method."""
+
+    def test_given_valid_args_then_correct(self):
+        start = "2022-01-13 22:45:00"
+        end = "2022-02-24 00:23:00"
+        expected = Period(
+            Timestamp(year=2022, month=1, day=13).normalize(),
+            Timestamp(year=2022, month=2, day=24).normalize(),
+        )
+        actual = date_period(start, end)
+        self.assertEqual(expected, actual)
