@@ -55,7 +55,7 @@ class CalculateBreakdownTests(TestCase):
 class BreakdownAsCsvTests(TestCase):
     """Unit-tests for `budget_breakdown.breakdown_as_csv` method."""
 
-    def test_budget_as_csv(self):
+    def test_breakdown_as_csv(self):
         yaml_text = dedent(
             """\
             PERIOD:
