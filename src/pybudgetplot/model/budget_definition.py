@@ -160,4 +160,5 @@ def calculate_budget_breakdown(budget: BudgetDefinition) -> DataFrame:
 
     breakdown_data["daily_total"] = breakdown_data.sum(axis=1)
     breakdown_data["cumulative_total"] = breakdown_data["daily_total"].cumsum()
+    breakdown_data.index.rename("date", True)
     return breakdown_data

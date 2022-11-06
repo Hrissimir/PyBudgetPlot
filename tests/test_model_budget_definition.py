@@ -144,8 +144,10 @@ class CalculateBudgetBreakdownTests(TestCase):
         self.assertIsInstance(breakdown, DataFrame)
 
         expected = dedent(
+            # pylint: disable=trailing-whitespace
             """\
                          cash  food  commute  daily_total  cumulative_total
+            date
             2021-12-31  200.0   0.0      0.0        200.0             200.0
             2022-01-01    0.0  -5.0      0.0         -5.0             195.0
             2022-01-02    0.0  -5.0     -1.0         -6.0             189.0
