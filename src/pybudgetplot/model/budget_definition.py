@@ -4,6 +4,7 @@ from io import StringIO
 from typing import List, NamedTuple
 
 import yaml
+from pandas import DataFrame, DatetimeIndex, Series, concat, date_range
 
 from pybudgetplot.model.budget_item import BudgetItem, new_budget_item
 from pybudgetplot.utils.time_util import Period, date_period
@@ -65,15 +66,15 @@ def new_budget_definition(period_start, period_end) -> BudgetDefinition:
     return budget
 
 
-def budget_as_yaml(budget: BudgetDefinition) -> str:
-    """Formats the budged definition in YAML format."""
+def budget_as_dict(budget: BudgetDefinition) -> dict:
+    """Returns a dict with the budget definition data."""
 
-    period_data = {
+    period_dict = {
         "start": budget.period.start.date().isoformat(),
         "end": budget.period.end.date().isoformat()
     }
 
-    items_data = {
+    items_dict = {
         item.description: {
             "amount": item.amount,
             "frequency": item.frequency
@@ -82,14 +83,22 @@ def budget_as_yaml(budget: BudgetDefinition) -> str:
         in budget.items
     }
 
-    budget_data = {
-        "PERIOD": period_data,
-        "ITEMS": items_data,
+    budget_dict = {
+        "PERIOD": period_dict,
+        "ITEMS": items_dict,
     }
+
+    return budget_dict
+
+
+def budget_as_yaml(budget: BudgetDefinition) -> str:
+    """Formats the budged definition in YAML format."""
+
+    budget_dict = budget_as_dict(budget)
 
     buffer = StringIO(newline="\n")
     yaml.dump(
-        budget_data,
+        budget_dict,
         buffer,
         Dumper=yaml.SafeDumper,
         indent=4,
@@ -102,11 +111,8 @@ def budget_as_yaml(budget: BudgetDefinition) -> str:
     return buffer.getvalue()
 
 
-def budget_from_yaml(text) -> BudgetDefinition:
-    """Parses and returns BudgetDefinition from string with YAML text."""
-
-    buffer = StringIO(text)
-    budget_data = yaml.load(buffer, Loader=yaml.SafeLoader)
+def budget_from_dict(budget_data: dict) -> BudgetDefinition:
+    """Creates BudgetDefinition instance from data dict."""
 
     period_data = budget_data["PERIOD"]
     period_start = period_data["start"]
@@ -120,3 +126,38 @@ def budget_from_yaml(text) -> BudgetDefinition:
         budget.add_item(item_description, item_amount, item_frequency)
 
     return budget
+
+
+def budget_from_yaml(text) -> BudgetDefinition:
+    """Parses and returns BudgetDefinition from string with YAML text."""
+
+    buffer = StringIO(text)
+    budget_data = yaml.load(buffer, Loader=yaml.SafeLoader)
+    return budget_from_dict(budget_data)
+
+
+def calculate_budget_breakdown(budget: BudgetDefinition) -> DataFrame:
+    """Calculates the breakdown of the budget's "daily" and "cumulative" totals.
+
+    Args:
+        budget: Budget definition.
+
+    Returns:
+        DataFrame with the breakdown values.
+    """
+
+    breakdown_data = DataFrame(
+        index=date_range(budget.period.start, budget.period.end)
+    )
+
+    for item in budget.items:
+        item_dates = budget.period.generate_dates(item.frequency)
+        item_data = DataFrame(
+            data={item.description: item.amount},
+            index=DatetimeIndex(Series(item_dates, dtype=object))
+        )
+        breakdown_data = concat([breakdown_data, item_data], axis=1).fillna(0)
+
+    breakdown_data["daily_total"] = breakdown_data.sum(axis=1)
+    breakdown_data["cumulative_total"] = breakdown_data["daily_total"].cumsum()
+    return breakdown_data
