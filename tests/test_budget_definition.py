@@ -8,6 +8,55 @@ from pybudgetplot.budget.budget_definition import BudgetDefinition, budget_as_ya
 from pybudgetplot.budget.budget_item import BudgetItem
 from pybudgetplot.utils.time_util import Period
 
+BUDGET = BudgetDefinition(
+    period=Period(
+        start=Timestamp(
+            year=2021,
+            month=12,
+            day=31),
+        end=Timestamp(
+            year=2022,
+            month=1,
+            day=5
+        )
+    ),
+    items=[
+        BudgetItem(
+            description="cash",
+            amount=200,
+            frequency="2021-12-31"
+        ),
+        BudgetItem(
+            description="food",
+            amount=-5,
+            frequency="every day starting 2022-01-01"
+        ),
+        BudgetItem(
+            description="commute",
+            amount=-1,
+            frequency="every day starting 2022-01-02 until 2022-01-04"
+        ),
+    ]
+
+)
+BUDGET_YAML = dedent(
+    """\
+    PERIOD:
+        start: '2021-12-31'
+        end: '2022-01-05'
+    ITEMS:
+        cash:
+            amount: 200
+            frequency: '2021-12-31'
+        food:
+            amount: -5
+            frequency: every day starting 2022-01-01
+        commute:
+            amount: -1
+            frequency: every day starting 2022-01-02 until 2022-01-04
+    """
+)
+
 
 class NewBudgetDefinitionTests(TestCase):
     """Unit-tests for the `budget_definition.new_budget_definition` method."""
@@ -50,30 +99,8 @@ class BudgetAsYamlTests(TestCase):
     """Unit-tests for the `budget_definition.budget_as_yaml` method."""
 
     def test_budget_as_yaml(self):
-        budget = new_budget("2021-12-31", "2022-01-05")
-        budget.add_item("cash", 200, "2021-12-31")
-        budget.add_item("food", -5, "every day starting 2022-01-01")
-        budget.add_item(
-            "commute", -1, "every day starting 2022-01-02 until 2022-01-04"
-        )
-
-        expected = dedent(
-            """\
-            PERIOD:
-                start: '2021-12-31'
-                end: '2022-01-05'
-            ITEMS:
-                cash:
-                    amount: 200
-                    frequency: '2021-12-31'
-                food:
-                    amount: -5
-                    frequency: every day starting 2022-01-01
-                commute:
-                    amount: -1
-                    frequency: every day starting 2022-01-02 until 2022-01-04
-            """
-        )
+        budget = BUDGET
+        expected = BUDGET_YAML
         actual = budget_as_yaml(budget)
         self.assertEqual(expected, actual)
 
@@ -82,30 +109,6 @@ class BudgetFromYamlTests(TestCase):
     """Unit-tests for the `budget_definition.budget_from_yaml` method."""
 
     def test_budget_from_yaml(self):
-        text = dedent(
-            """\
-            PERIOD:
-                start: '2021-12-31'
-                end: '2022-01-05'
-            ITEMS:
-                cash:
-                    amount: 200
-                    frequency: '2021-12-31'
-                food:
-                    amount: -5
-                    frequency: every day starting 2022-01-01
-                commute:
-                    amount: -1
-                    frequency: every day starting 2022-01-02 until 2022-01-04
-            """
-        )
-
-        expected = new_budget("2021-12-31", "2022-01-05")
-        expected.add_item("cash", 200, "2021-12-31")
-        expected.add_item("food", -5, "every day starting 2022-01-01")
-        expected.add_item(
-            "commute", -1, "every day starting 2022-01-02 until 2022-01-04"
-        )
-
-        actual = budget_from_yaml(text)
+        expected = BUDGET
+        actual = budget_from_yaml(BUDGET_YAML)
         self.assertEqual(expected, actual)

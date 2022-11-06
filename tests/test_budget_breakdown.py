@@ -7,30 +7,30 @@ from pandas import DataFrame
 from pybudgetplot.budget.budget_breakdown import breakdown_as_csv, calculate_breakdown
 from pybudgetplot.budget.budget_definition import budget_from_yaml
 
+BUDGET_YAML = dedent(
+    """\
+    PERIOD:
+        start: '2021-12-31'
+        end: '2022-01-05'
+    ITEMS:
+        cash:
+            amount: 200
+            frequency: '2021-12-31'
+        food:
+            amount: -5
+            frequency: every day starting 2022-01-01
+        commute:
+            amount: -1
+            frequency: every day starting 2022-01-02 until 2022-01-04
+    """
+)
+
 
 class CalculateBreakdownTests(TestCase):
     """Unit-tests for `budget_breakdown.calculate_breakdown` method."""
 
     def test_calculate_budget_breakdown(self):
-        yaml_text = dedent(
-            """\
-            PERIOD:
-                start: '2021-12-31'
-                end: '2022-01-05'
-            ITEMS:
-                cash:
-                    amount: 200
-                    frequency: '2021-12-31'
-                food:
-                    amount: -5
-                    frequency: every day starting 2022-01-01
-                commute:
-                    amount: -1
-                    frequency: every day starting 2022-01-02 until 2022-01-04
-            """
-        )
-
-        budget = budget_from_yaml(yaml_text)
+        budget = budget_from_yaml(BUDGET_YAML)
         breakdown = calculate_breakdown(budget)
         self.assertIsInstance(breakdown, DataFrame)
 
@@ -46,9 +46,11 @@ class CalculateBreakdownTests(TestCase):
             2022-01-04    0.0  -5.0     -1.0         -6.0             177.0
             2022-01-05    0.0  -5.0      0.0         -5.0             172.0"""
         )
-        actual = "\n".join(
-            [line.rstrip() for line in str(breakdown).splitlines(False)]
-        )
+        actual = "\n".join([
+            line.rstrip()
+            for line
+            in str(breakdown).splitlines(False)
+        ])
         self.assertEqual(expected, actual)
 
 
@@ -56,25 +58,7 @@ class BreakdownAsCsvTests(TestCase):
     """Unit-tests for `budget_breakdown.breakdown_as_csv` method."""
 
     def test_breakdown_as_csv(self):
-        yaml_text = dedent(
-            """\
-            PERIOD:
-                start: '2021-12-31'
-                end: '2022-01-05'
-            ITEMS:
-                cash:
-                    amount: 200
-                    frequency: '2021-12-31'
-                food:
-                    amount: -5
-                    frequency: every day starting 2022-01-01
-                commute:
-                    amount: -1
-                    frequency: every day starting 2022-01-02 until 2022-01-04
-            """
-        )
-
-        budget = budget_from_yaml(yaml_text)
+        budget = budget_from_yaml(BUDGET_YAML)
         expected = dedent(
             """\
             date,cash,food,commute,daily_total,cumulative_total
