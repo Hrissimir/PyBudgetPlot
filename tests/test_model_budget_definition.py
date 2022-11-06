@@ -1,9 +1,15 @@
 """Unit-tests for the `pybudgetplot.model.budget_definition` module."""
+from textwrap import dedent
 from unittest import TestCase
 
 from pandas import Timestamp
 
-from pybudgetplot.model.budget_definition import BudgetDefinition, new_budget_definition
+from pybudgetplot.model.budget_definition import (
+    BudgetDefinition,
+    budget_as_yaml,
+    budget_from_yaml,
+    new_budget_definition,
+)
 from pybudgetplot.model.budget_item import BudgetItem
 from pybudgetplot.utils.time_util import Period
 
@@ -39,3 +45,60 @@ class BudgetDefinitionTests(TestCase):
         self.assertEqual(expected_item, actual_item)
         self.assertIn(actual_item, budget.items)
         self.assertEqual(1, len(budget.items))
+
+    def test_budget_as_yaml(self):
+        budget = new_budget_definition("2021-12-31", "2022-01-05")
+        budget.add_item("cash", 200, "2021-12-31")
+        budget.add_item("food", -5, "every day starting 2022-01-01")
+        budget.add_item(
+            "commute", -1, "every day starting 2022-01-02 until 2022-01-04"
+        )
+
+        expected = dedent(
+            """\
+            PERIOD:
+                start: '2021-12-31'
+                end: '2022-01-05'
+            ITEMS:
+                cash:
+                    amount: 200
+                    frequency: '2021-12-31'
+                food:
+                    amount: -5
+                    frequency: every day starting 2022-01-01
+                commute:
+                    amount: -1
+                    frequency: every day starting 2022-01-02 until 2022-01-04
+            """
+        )
+        actual = budget_as_yaml(budget)
+        self.assertEqual(expected, actual)
+
+    def test_budget_from_yaml(self):
+        text = dedent(
+            """\
+            PERIOD:
+                start: '2021-12-31'
+                end: '2022-01-05'
+            ITEMS:
+                cash:
+                    amount: 200
+                    frequency: '2021-12-31'
+                food:
+                    amount: -5
+                    frequency: every day starting 2022-01-01
+                commute:
+                    amount: -1
+                    frequency: every day starting 2022-01-02 until 2022-01-04
+            """
+        )
+
+        expected = new_budget_definition("2021-12-31", "2022-01-05")
+        expected.add_item("cash", 200, "2021-12-31")
+        expected.add_item("food", -5, "every day starting 2022-01-01")
+        expected.add_item(
+            "commute", -1, "every day starting 2022-01-02 until 2022-01-04"
+        )
+
+        actual = budget_from_yaml(text)
+        self.assertEqual(expected, actual)

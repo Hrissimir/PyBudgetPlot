@@ -1,6 +1,9 @@
 """This module defines the logic for dealing with budget definitions."""
 import logging
+from io import StringIO
 from typing import List, NamedTuple
+
+import yaml
 
 from pybudgetplot.model.budget_item import BudgetItem, new_budget_item
 from pybudgetplot.utils.time_util import Period, date_period
@@ -62,9 +65,58 @@ def new_budget_definition(period_start, period_end) -> BudgetDefinition:
     return budget
 
 
-def main():
-    pass
+def budget_as_yaml(budget: BudgetDefinition) -> str:
+    """Formats the budged definition in YAML format."""
+
+    period_data = {
+        "start": budget.period.start.date().isoformat(),
+        "end": budget.period.end.date().isoformat()
+    }
+
+    items_data = {
+        item.description: {
+            "amount": item.amount,
+            "frequency": item.frequency
+        }
+        for item
+        in budget.items
+    }
+
+    budget_data = {
+        "PERIOD": period_data,
+        "ITEMS": items_data,
+    }
+
+    buffer = StringIO(newline="\n")
+    yaml.dump(
+        budget_data,
+        buffer,
+        Dumper=yaml.SafeDumper,
+        indent=4,
+        width=80,
+        allow_unicode=True,
+        line_break="\n",
+        encoding="utf-8",
+        sort_keys=False,
+    )
+    return buffer.getvalue()
 
 
-if __name__ == "__main__":
-    main()
+def budget_from_yaml(text) -> BudgetDefinition:
+    """Parses and returns BudgetDefinition from string with YAML text."""
+
+    buffer = StringIO(text)
+    budget_data = yaml.load(buffer, Loader=yaml.SafeLoader)
+
+    period_data = budget_data["PERIOD"]
+    period_start = period_data["start"]
+    period_end = period_data["end"]
+    budget = new_budget_definition(period_start, period_end)
+
+    items_data = budget_data["ITEMS"]
+    for item_description, item_details in items_data.items():
+        item_amount = item_details["amount"]
+        item_frequency = item_details["frequency"]
+        budget.add_item(item_description, item_amount, item_frequency)
+
+    return budget
