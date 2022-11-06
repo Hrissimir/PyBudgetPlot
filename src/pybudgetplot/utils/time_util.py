@@ -135,7 +135,7 @@ def stamp_to_str(stamp: Timestamp) -> str:
     """
 
     if is_normalized(stamp):
-        return str(stamp.date())
+        return stamp.date().isoformat()
 
     return str(stamp)
 
