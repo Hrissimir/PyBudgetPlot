@@ -4,7 +4,7 @@ from unittest import TestCase
 
 from pandas import DataFrame
 
-from pybudgetplot.budget.budget_breakdown import breakdown_as_csv, calculate_breakdown
+from pybudgetplot.budget.budget_breakdown import breakdown_as_csv, breakdown_as_excel, calculate_breakdown
 from pybudgetplot.budget.budget_definition import budget_from_yaml
 
 BUDGET_YAML = dedent(
@@ -59,6 +59,7 @@ class BreakdownAsCsvTests(TestCase):
 
     def test_breakdown_as_csv(self):
         budget = budget_from_yaml(BUDGET_YAML)
+        breakdown = calculate_breakdown(budget)
         expected = dedent(
             """\
             date,cash,food,commute,daily_total,cumulative_total
@@ -68,6 +69,23 @@ class BreakdownAsCsvTests(TestCase):
             2022-01-03,0,-5,-1,-6,183
             2022-01-04,0,-5,-1,-6,177
             2022-01-05,0,-5,0,-5,172
-            """)
-        actual = breakdown_as_csv(budget)
+            """
+        ).encode(encoding="utf-8", errors="surrogateescape")
+        actual = breakdown_as_csv(breakdown)
         self.assertEqual(expected, actual)
+
+
+class BreakdownAsExcelTests(TestCase):
+    """Unit-tests for `budget_breakdown.breakdown_as_excel` method."""
+
+    def setUp(self) -> None:
+        self.maxDiff = None
+
+    def test_breakdown_as_excel(self):
+        budget = budget_from_yaml(BUDGET_YAML)
+        breakdown = calculate_breakdown(budget)
+        excel_bytes = breakdown_as_excel(breakdown)
+        print(excel_bytes)
+        expected_bytes_count = 6994
+        actual_bytes_count = len(excel_bytes)
+        self.assertGreaterEqual(actual_bytes_count, expected_bytes_count)
