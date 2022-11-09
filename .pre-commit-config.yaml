@@ -60,7 +60,7 @@ repos:
         "types": [ python ]
         require_serial: true
         args: [
-          '--config .autoflake.cfg',
+          '--config=.autoflake.cfg',
         ]
   - repo: https://github.com/PyCQA/isort
     rev: 5.10.1
