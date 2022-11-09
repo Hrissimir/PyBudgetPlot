@@ -60,12 +60,6 @@ Source = "https://github.com/Hrissimir/PyBudgetPlot"
 [project.scripts]
 budget = "pybudgetplot.cli:cli"
 
-[tool.black]
-include = '\.pyi?$'
-line-length = 120
-skip-string-normalization = true
-target-version = ["py37"]
-
 [tool.hatch.version]
 path = "src/pybudgetplot/__about__.py"
 
@@ -83,25 +77,22 @@ dependencies = [
     "pyflakes>=2.5.0",
     "pycodestyle>=2.9.1",
     "flake8>=5.0.4",
-    "flake8-bandit>=4.1.1",
     "flake8-builtins>=2.0.0",
     "flake8-comprehensions>=3.10.0",
-    "flake8-docstrings>=1.6.0",
-    "flake8-eradicate>=1.4.0",
 ]
 
 [tool.hatch.envs.default.scripts]
 cov = "pytest {args}"
 no-cov = "cov --no-cov {args}"
 code-check = [
-    "pylint .",
-    "flake8 --config=.flake8 --require-plugins=mccabe,pyflakes,pycodestyle,flake8-bandit,flake8-builtins,flake8-comprehensions,flake8-docstrings,flake8-eradicate,flake8-quotes ./src ./tests",
-    "black --check --diff ./src ./tests",
-    "isort --settings-path .isort.cfg --check-only --diff ./src ./tests",
+    "pylint --verbose ./src ./tests",
+    "flake8 --verbose --config=.flake8 --require-plugins=mccabe,pyflakes,pycodestyle,flake8-builtins,flake8-comprehensions ./src ./tests",
+    "black --verbose --config=.black --check --diff ./src ./tests",
+    "isort --verbose --settings-path=.isort.cfg --check-only --diff ./src ./tests",
 ]
 code-format = [
-    "isort --settings-path .isort.cfg ./src ./tests",
-    "black ./src ./tests",
+    "isort --verbose --settings-path=.isort.cfg ./src ./tests",
+    "black --verbose --config=.black ./src ./tests",
     "code-check"
 ]
 

@@ -48,8 +48,5 @@ require-plugins =
     mccabe,
     pyflakes,
     pycodestyle,
-    flake8-bandit,
     flake8-builtins,
-    flake8-comprehensions,
-    flake8-docstrings,
-    flake8-eradicate
+    flake8-comprehensions

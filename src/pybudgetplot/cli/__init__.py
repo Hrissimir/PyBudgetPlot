@@ -6,12 +6,10 @@ from textwrap import dedent
 
 import click
 
-from pybudgetplot.model.budget_breakdown import breakdown_as_csv, calculate_breakdown
-from pybudgetplot.model.budget_definition import from_yaml
+from pybudgetplot.datamodel import BudgetDefinition
 from pybudgetplot.utils import plot_util
 
 from ..__about__ import __version__  # pylint: disable=relative-beyond-top-level
-from ..datamodel import as_xlsx
 
 SAMPLE_YAML = dedent(
     """\
@@ -101,7 +99,7 @@ def init(file):
         readable=True,
         resolve_path=True,
         allow_dash=False,
-        path_type=Path
+        path_type=Path,
     ),
     required=True,
 )
@@ -110,19 +108,19 @@ def plot(interactive: bool, png: bool, csv: bool, xlsx: bool, yaml_file: Path):
 
     file = yaml_file.absolute().resolve()
     text = file.read_text(encoding="utf-8", errors="surrogateescape")
-    budget = from_yaml(text)
-    breakdown = calculate_breakdown(budget)
+    budget = BudgetDefinition.from_yaml(text)
+    breakdown = budget.calculate_breakdown()
 
     folder = file.parent
 
     if csv:
         csv_file = folder.joinpath(f"{file.stem}.csv")
-        csv_bytes = breakdown_as_csv(breakdown)
+        csv_bytes = budget.to_csv()
         csv_file.write_bytes(csv_bytes)
 
     if xlsx:
         xlsx_file = folder.joinpath(f"{file.stem}.xlsx")
-        xlsx_bytes = as_xlsx(breakdown)
+        xlsx_bytes = budget.to_xlsx()
         xlsx_file.write_bytes(xlsx_bytes)
 
     if (not interactive) and (not png):

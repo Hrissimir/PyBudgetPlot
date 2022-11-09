@@ -44,7 +44,9 @@ LEVEL_TO_NAME = {
 LOG_DATE_FORMAT_DEBUG = "%Y-%m-%d %H:%M:%S"
 LOG_DATE_FORMAT_INFO = "%H:%M:%S"
 
-LOG_FORMAT_DEBUG = "%(asctime)s.%(msecs)d | %(levelname)9s | %(pathname)s:%(lineno)d - %(message)s"
+LOG_FORMAT_DEBUG = (
+    "%(asctime)s.%(msecs)d | %(levelname)9s | %(pathname)s:%(lineno)d - %(message)s"
+)
 LOG_FORMAT_INFO = "%(asctime)s | %(levelname)9s | %(name)s - %(message)s"
 
 LOG_FORMATTER_CONVERTER_DEBUG = time.gmtime
@@ -231,7 +233,9 @@ def remove_handlers(logger: logging.Logger) -> NoReturn:
         logger.removeHandler(handler)
 
 
-def add_file_handler(logger: logging.Logger, file: Union[str, PathLike, Path], level: Any) -> logging.FileHandler:
+def add_file_handler(
+    logger: logging.Logger, file: Union[str, PathLike, Path], level: Any
+) -> logging.FileHandler:
     """Creates a new FileHandler, adds it to the given Logger and returns it."""
 
     # process args
@@ -253,7 +257,10 @@ def add_file_handler(logger: logging.Logger, file: Union[str, PathLike, Path], l
 
 
 def init_logging(
-    level: Any, *, stream: Optional[TextIO] = sys.stdout, file: Optional[Union[str, PathLike, Path]] = None
+    level: Any,
+    *,
+    stream: Optional[TextIO] = sys.stdout,
+    file: Optional[Union[str, PathLike, Path]] = None
 ) -> NoReturn:
     """Initialize the global logging framework with the settings."""
 

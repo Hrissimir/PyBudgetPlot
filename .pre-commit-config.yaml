@@ -26,6 +26,8 @@ repos:
         types: [ python ]
         args:
           [
+            "--verbose",
+            "--rcfile=.pylintrc",
             "-rn", # Only display messages
             "-sn", # Don't display the score
           ]
@@ -46,7 +48,8 @@ repos:
     hooks:
       - id: isort
         args: [
-          '--settings-file=pyproject.toml',
+          '--verbose',
+          '--settings-path=.isort.cfg',
         ]
 
   - repo: https://github.com/psf/black
@@ -55,6 +58,8 @@ repos:
       - id: black
         language_version: python3
         args: [
+          '--verbose',
+          '--config=.black',
           '--diff',
         ]
 
@@ -80,6 +85,7 @@ repos:
           flake8-quotes
         ]
         args: [
+          '--verbose',
           '--config=.flake8',
-          '--require-plugins=mccabe,pyflakes,pycodestyle,flake8-bandit,flake8-builtins,flake8-comprehensions,flake8-docstrings,flake8-eradicate',
+          '--require-plugins=mccabe,pyflakes,pycodestyle,flake8-builtins,flake8-comprehensions',
         ]

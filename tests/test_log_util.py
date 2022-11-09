@@ -211,7 +211,9 @@ class CreateFormatterTestCase(TestCase):
         module = "pybudgetplot.utils.log_util"
         with patch(f"{module}.get_log_format", return_value=fmt) as get_fmt, patch(
             f"{module}.get_log_date_format", return_value=datefmt
-        ) as get_datefmt, patch(f"{module}.get_log_formatter_converter", return_value=converter) as get_conv:
+        ) as get_datefmt, patch(
+            f"{module}.get_log_formatter_converter", return_value=converter
+        ) as get_conv:
             formatter = create_formatter(level)
         self.assertIsInstance(formatter, logging.Formatter)
         get_fmt.assert_called_once_with(level)
@@ -337,7 +339,9 @@ class AddFileHandlerTestCase(TestCase):
     """Unit-tests for the ``log_util.add_file_handler`` method."""
 
     def test_given_valid_args_then_handler_added(self):
-        logger = logging.getLogger("AddFileHandlerTestCase.test_given_valid_args_then_handler_added")
+        logger = logging.getLogger(
+            "AddFileHandlerTestCase.test_given_valid_args_then_handler_added"
+        )
         remove_handlers(logger)
         self.assertEqual(0, len(logger.handlers))
 
@@ -370,9 +374,13 @@ class InitLoggingTestCase(TestCase):
     def test_given_level_debug_when_stream_arg_and_file_arg_then_initialized(self):
         buffer = io.BytesIO()
         stream = io.TextIOWrapper(buffer, "utf-8", "surrogateescape", "\n")
-        with TemporaryDirectory() as temp_dir, patch("logging.Formatter") as mock_formatter_cls, patch(
+        with TemporaryDirectory() as temp_dir, patch(
+            "logging.Formatter"
+        ) as mock_formatter_cls, patch(
             "logging.basicConfig"
-        ) as mock_config_method, patch("pybudgetplot.utils.log_util.add_file_handler") as mock_add_file_handler:
+        ) as mock_config_method, patch(
+            "pybudgetplot.utils.log_util.add_file_handler"
+        ) as mock_add_file_handler:
             temp_dir_path = Path(temp_dir)
             file = temp_dir_path.joinpath("out.log")
 
@@ -405,7 +413,9 @@ class InitLoggingTestCase(TestCase):
         stream = io.TextIOWrapper(buffer, "utf-8", "surrogateescape", "\n")
         with patch("logging.Formatter") as mock_formatter_cls, patch(
             "logging.basicConfig"
-        ) as mock_config_method, patch("pybudgetplot.utils.log_util.add_file_handler") as mock_add_file_handler:
+        ) as mock_config_method, patch(
+            "pybudgetplot.utils.log_util.add_file_handler"
+        ) as mock_add_file_handler:
             init_logging("info", stream=stream)
 
             actual_converter = mock_formatter_cls.converter
@@ -433,7 +443,9 @@ class InitLoggingTestCase(TestCase):
     ):
         with patch("logging.Formatter") as mock_formatter_cls, patch(
             "logging.basicConfig"
-        ) as mock_config_method, patch("pybudgetplot.utils.log_util.add_file_handler") as mock_add_file_handler:
+        ) as mock_config_method, patch(
+            "pybudgetplot.utils.log_util.add_file_handler"
+        ) as mock_add_file_handler:
             init_logging(None)
 
             actual_converter = mock_formatter_cls.converter

@@ -17,7 +17,9 @@ ITEM_CASH = BudgetItem("cash", 200, "2021-12-31")
 
 ITEM_FOOD = BudgetItem("food", -5, "every day starting 2022-01-01")
 
-ITEM_COMMUTE = BudgetItem("commute", -1, "every day starting 2022-01-02 until 2022-01-04")
+ITEM_COMMUTE = BudgetItem(
+    "commute", -1, "every day starting 2022-01-02 until 2022-01-04"
+)
 
 # Budget data
 BUDGET = BudgetDefinition(START_DATESTAMP, END_DATESTAMP)
@@ -41,10 +43,7 @@ BUDGET_YAML_STR = dedent(
     """
 )
 
-BUDGET_YAML_BYTES = BUDGET_YAML_STR.encode(
-    encoding="utf-8",
-    errors="surrogateescape"
-)
+BUDGET_YAML_BYTES = BUDGET_YAML_STR.encode(encoding="utf-8", errors="surrogateescape")
 
 BUDGET_CSV_STR = dedent(
     """\
@@ -58,10 +57,7 @@ BUDGET_CSV_STR = dedent(
     """
 )
 
-BUDGET_CSV_BYTES = BUDGET_CSV_STR.encode(
-    encoding="utf-8",
-    errors="surrogateescape"
-)
+BUDGET_CSV_BYTES = BUDGET_CSV_STR.encode(encoding="utf-8", errors="surrogateescape")
 
 
 class DatePeriodTests(TestCase):
@@ -78,9 +74,7 @@ class DatePeriodTests(TestCase):
         self.assertEqual(expected, actual)
 
     def test_format_timestamp_with_non_normalized_timestamp(self):
-        stamp = Timestamp(
-            year=2022, month=1, day=2, hour=3, minute=4, microsecond=5
-        )
+        stamp = Timestamp(year=2022, month=1, day=2, hour=3, minute=4, microsecond=5)
         expected = "2022-01-02 03:04:00.000005"
         actual = DatePeriod.format_timestamp(stamp)
         self.assertEqual(expected, actual)
@@ -127,15 +121,11 @@ class DatePeriodTests(TestCase):
         self.assertTupleEqual(expected, actual)
 
     def test_is_datestamp_with_non_normalized_timestamp(self):
-        stamp = Timestamp(
-            year=2022, month=1, day=2, hour=0, minute=0, microsecond=1
-        )
+        stamp = Timestamp(year=2022, month=1, day=2, hour=0, minute=0, microsecond=1)
         self.assertFalse(DatePeriod.is_datestamp(stamp))
 
     def test_is_datestamp_with_normalized_timestamp(self):
-        stamp = Timestamp(
-            year=2022, month=1, day=2, hour=0, minute=0, microsecond=0
-        )
+        stamp = Timestamp(year=2022, month=1, day=2, hour=0, minute=0, microsecond=0)
         self.assertTrue(DatePeriod.is_datestamp(stamp))
 
     def test_parse_datestamp_with_bad_string(self):
@@ -336,11 +326,7 @@ class BudgetDefinitionTests(TestCase):
             2022-01-04    0.0  -5.0     -1.0         -6.0             177.0
             2022-01-05    0.0  -5.0      0.0         -5.0             172.0"""
         )
-        actual = "\n".join([
-            line.rstrip()
-            for line
-            in str(breakdown).splitlines(False)
-        ])
+        actual = "\n".join([line.rstrip() for line in str(breakdown).splitlines(False)])
         self.assertEqual(expected, actual)
 
     def test_to_csv(self):

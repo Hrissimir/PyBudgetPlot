@@ -28,10 +28,18 @@ class DatePeriod:
     end_date: InitVar[DateStamp]
 
     start: Timestamp = field(
-        init=False, repr=True, hash=True, compare=True, default=None,
+        init=False,
+        repr=True,
+        hash=True,
+        compare=True,
+        default=None,
     )
     end: Timestamp = field(
-        init=False, repr=True, hash=True, compare=True, default=None,
+        init=False,
+        repr=True,
+        hash=True,
+        compare=True,
+        default=None,
     )
 
     def __post_init__(self, start_date: DateStamp, end_date: DateStamp):
@@ -72,10 +80,10 @@ class DatePeriod:
         if not isinstance(stamp, Timestamp):
             raise TypeError(stamp, Timestamp, type(stamp))
         return (
-                (stamp.hour == 0)
-                and (stamp.minute == 0)
-                and (stamp.second == 0)
-                and (stamp.microsecond == 0)
+            (stamp.hour == 0)
+            and (stamp.minute == 0)
+            and (stamp.second == 0)
+            and (stamp.microsecond == 0)
         )
 
     @classmethod
@@ -119,8 +127,7 @@ class DatePeriod:
                     # ensure all Timestamps are normalized.
                     result = [
                         Timestamp(occurrence).normalize()
-                        for occurrence
-                        in rule.between(self.start, self.end, inc=True)
+                        for occurrence in rule.between(self.start, self.end, inc=True)
                     ]
 
             except Exception as ex:
@@ -139,21 +146,15 @@ class BudgetItem:
     item_amount: InitVar[Union[int, float, str, None]]
     item_freq: InitVar[Union[str, None]]
 
-    description: str = field(
-        init=False, repr=True, hash=True, compare=True
-    )
-    amount: int = field(
-        init=False, repr=True, hash=True, compare=True
-    )
-    frequency: str = field(
-        init=False, repr=True, hash=True, compare=True
-    )
+    description: str = field(init=False, repr=True, hash=True, compare=True)
+    amount: int = field(init=False, repr=True, hash=True, compare=True)
+    frequency: str = field(init=False, repr=True, hash=True, compare=True)
 
     def __post_init__(
-            self,
-            item_desc: Union[str, None],
-            item_amount: Union[int, float, str, None],
-            item_freq: Union[str, None]
+        self,
+        item_desc: Union[str, None],
+        item_amount: Union[int, float, str, None],
+        item_freq: Union[str, None],
     ):
         """Post-initialize a new BudgetItem instance."""
 
@@ -192,11 +193,19 @@ class BudgetDefinition:
     period_end: InitVar[DateStamp]
 
     period: DatePeriod = field(
-        init=False, repr=True, hash=True, compare=True, default=False,
+        init=False,
+        repr=True,
+        hash=True,
+        compare=True,
+        default=False,
     )
 
     items: List[BudgetItem] = field(
-        init=True, repr=True, hash=True, compare=True, default_factory=list,
+        init=True,
+        repr=True,
+        hash=True,
+        compare=True,
+        default_factory=list,
     )
 
     def __post_init__(self, period_start: DateStamp, period_end: DateStamp):
@@ -242,15 +251,11 @@ class BudgetDefinition:
         return {
             "PERIOD": {
                 "start": self.period.start.date().isoformat(),
-                "end": self.period.end.date().isoformat()
+                "end": self.period.end.date().isoformat(),
             },
             "ITEMS": {
-                item.description: {
-                    "amount": item.amount,
-                    "frequency": item.frequency
-                }
-                for item
-                in self.items
+                item.description: {"amount": item.amount, "frequency": item.frequency}
+                for item in self.items
             },
         }
 
@@ -275,15 +280,13 @@ class BudgetDefinition:
     def calculate_breakdown(self) -> DataFrame:
         """Calculates a breakdown of the "daily" and "cumulative" totals."""
 
-        df = DataFrame(
-            index=date_range(self.period.start, self.period.end)
-        )
+        df = DataFrame(index=date_range(self.period.start, self.period.end))
 
         for item in self.items:
             item_dates = self.period.generate_dates(item.frequency)
             item_df = DataFrame(
                 data={item.description: item.amount},
-                index=DatetimeIndex(Series(item_dates, dtype=object))
+                index=DatetimeIndex(Series(item_dates, dtype=object)),
             )
             df = concat([df, item_df], axis=1).fillna(0)
 
@@ -322,48 +325,57 @@ class BudgetDefinition:
         idx_cum_total = len(column_names) - 1
         idx_total = idx_cum_total - 1
 
-        fmt_header = workbook.add_format({
-            "bold": True,
-            "align": "center",
-            "valign": "vcenter",
-            "border": 1,
-            "top": 2,
-            "bottom": 2,
-        })
+        fmt_header = workbook.add_format(
+            {
+                "bold": True,
+                "align": "center",
+                "valign": "vcenter",
+                "border": 1,
+                "top": 2,
+                "bottom": 2,
+            }
+        )
 
-        fmt_date = workbook.add_format({
-            "num_format": "yyyy-mm-dd",
-            "align": "center",
-            "valign": "vcenter",
-            "left": 2,
-            "right": 2,
-        })
+        fmt_date = workbook.add_format(
+            {
+                "num_format": "yyyy-mm-dd",
+                "align": "center",
+                "valign": "vcenter",
+                "left": 2,
+                "right": 2,
+            }
+        )
 
-        fmt_item = workbook.add_format({
-            "num_format": "[Blue]General;[Red]-General;General",
-            "valign": "vcenter",
-        })
+        fmt_item = workbook.add_format(
+            {
+                "num_format": "[Blue]General;[Red]-General;General",
+                "valign": "vcenter",
+            }
+        )
 
-        fmt_total = workbook.add_format({
-            "italic": True,
-            "num_format": "[Blue]General;[Red]-General;General",
-            "valign": "vcenter",
-            "left": 2,
-            "right": 2,
-        })
+        fmt_total = workbook.add_format(
+            {
+                "italic": True,
+                "num_format": "[Blue]General;[Red]-General;General",
+                "valign": "vcenter",
+                "left": 2,
+                "right": 2,
+            }
+        )
 
-        fmt_cum_total = workbook.add_format({
-            "bold": True,
-            "num_format": "[Blue]General;[Red]-General;General",
-            "valign": "vcenter",
-            "left": 2,
-            "right": 2,
-        })
+        fmt_cum_total = workbook.add_format(
+            {
+                "bold": True,
+                "num_format": "[Blue]General;[Red]-General;General",
+                "valign": "vcenter",
+                "left": 2,
+                "right": 2,
+            }
+        )
 
         rows = [
             ([item[0].date()] + [int(_) for _ in item[1:]])
-            for item
-            in breakdown.itertuples()
+            for item in breakdown.itertuples()
         ]
 
         def get_column_format(col_idx: int):
@@ -472,7 +484,7 @@ class BudgetBreakdown:
             item_dates = period.generate_dates(item.frequency)
             item_df = DataFrame(
                 data={item.description: item.amount},
-                index=DatetimeIndex(Series(item_dates, dtype=object))
+                index=DatetimeIndex(Series(item_dates, dtype=object)),
             )
             df = concat([df, item_df], axis=1).fillna(0)
 
