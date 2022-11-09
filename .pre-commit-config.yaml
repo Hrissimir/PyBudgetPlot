@@ -32,18 +32,20 @@ repos:
             "-sn", # Don't display the score
           ]
 
-  - repo: https://github.com/myint/autoflake
+  - repo: https://github.com/PyCQA/autoflake
     rev: v1.7.7
     hooks:
       - id: autoflake
+        name: autoflake
+        entry: autoflake
+        language: python
+        "types": [ python ]
+        require_serial: true
         args: [
-          '--check-diff',
-          '--verbose',
-          '--in-place',
-          '--recursive',
+          '--config .autoflake.cfg',
         ]
 
-  - repo: https://github.com/pycqa/isort
+  - repo: https://github.com/PyCQA/isort
     rev: 5.10.1
     hooks:
       - id: isort
@@ -77,12 +79,8 @@ repos:
           mccabe,
           pyflakes,
           pycodestyle,
-          flake8-bandit,
           flake8-builtins,
           flake8-comprehensions,
-          flake8-docstrings,
-          flake8-eradicate,
-          flake8-quotes
         ]
         args: [
           '--verbose',
