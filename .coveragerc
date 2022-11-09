@@ -4,6 +4,7 @@ parallel = true
 omit =
     **/__about__.py
     **/__init__.py
+    **/conftest.py
 [paths]
 source =
     src/
