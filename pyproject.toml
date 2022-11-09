@@ -78,49 +78,6 @@ multi_line_output = 3
 skip_gitignore = true
 use_parentheses = true
 
-[tool.pytest.ini_options]
-minversion = "6.0"
-addopts = "--verbose --full-trace --cov-report=term-missing"
-console_output_style = "classic"
-faulthandler_timeout = 180
-filterwarnings = [
-    "error",
-    "ignore::DeprecationWarning",
-    "ignore::FutureWarning",
-    "ignore::UserWarning",
-]
-junit_duration_report = "call"
-junit_family = "xunit2"
-junit_logging = "all"
-junit_log_passing_tests = true
-junit_suite_name = "PyBudgetPlot-Tests"
-log_auto_indent = true
-log_cli = true
-log_cli_date_format = '%Y-%m-%d %H:%M:%S'
-log_cli_format = '%(asctime)s.%(msecs)3d | %(levelname)9s | %(name)s - %(message)s'
-log_cli_level = "DEBUG"
-log_date_format = '%Y-%m-%d %H:%M:%S'
-log_format = '%(asctime)s.%(msecs)3d | %(levelname)9s | %(name)s - %(message)s'
-log_level = "DEBUG"
-norecursedirs = [
-    ".git",
-    ".github",
-    ".hatch",
-    ".pytest_cache",
-    ".tox",
-    ".venv",
-    "build",
-    "dist",
-    "docs",
-    "htmlcov",
-    "site",
-]
-python_files = [
-    "test_*.py",
-    "check_*.py",
-    "example_*.py",
-]
-
 [tool.hatch.version]
 path = "src/pybudgetplot/__about__.py"
 
@@ -146,7 +103,7 @@ dependencies = [
 ]
 
 [tool.hatch.envs.default.scripts]
-cov = "pytest --cov-config=pyproject.toml --cov=src/pybudgetplot --cov=tests {args}"
+cov = "pytest {args}"
 no-cov = "cov --no-cov {args}"
 code-check = [
     "pylint .",
