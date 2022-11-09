@@ -66,30 +66,6 @@ line-length = 120
 skip-string-normalization = true
 target-version = ["py37"]
 
-[tool.coverage]
-messages = true
-verbose = true
-
-[tool.coverage.run]
-branch = true
-parallel = true
-omit = [
-    "__init__.py",
-    "src/pybudgetplot/__about__.py",
-]
-
-[tool.coverage.report]
-exclude_lines = [
-    "no cov",
-    "def __repr__",
-    "if 0:",
-    'if self\.debug',
-    "if __name__ == .__main__.:",
-    "if TYPE_CHECKING:",
-    "raise AssertionError",
-    "raise NotImplementedError",
-]
-
 [tool.isort]
 default_section = "THIRDPARTY"
 ensure_newline_before_comments = true

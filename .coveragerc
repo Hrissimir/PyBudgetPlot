@@ -1,0 +1,20 @@
+[run]
+branch = true
+parallel = true
+omit =
+    **/__about__.py
+    **/__init__.py
+[paths]
+source =
+    src/
+    tests/
+[report]
+exclude_lines =
+    no cov
+    def __repr__
+    if 0:
+    if self\.debug
+    if __name__ == .__main__.:
+    if TYPE_CHECKING:
+    raise AssertionError
+    raise NotImplementedError
