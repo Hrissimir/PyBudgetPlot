@@ -66,18 +66,6 @@ line-length = 120
 skip-string-normalization = true
 target-version = ["py37"]
 
-[tool.isort]
-default_section = "THIRDPARTY"
-ensure_newline_before_comments = true
-force_grid_wrap = 0
-honor_noqa = true
-include_trailing_comma = true
-known_first_party = ["pybudgetplot"]
-line_length = 120
-multi_line_output = 3
-skip_gitignore = true
-use_parentheses = true
-
 [tool.hatch.version]
 path = "src/pybudgetplot/__about__.py"
 
@@ -109,10 +97,10 @@ code-check = [
     "pylint .",
     "flake8 --config=.flake8 --require-plugins=mccabe,pyflakes,pycodestyle,flake8-bandit,flake8-builtins,flake8-comprehensions,flake8-docstrings,flake8-eradicate,flake8-quotes ./src ./tests",
     "black --check --diff ./src ./tests",
-    "isort --check-only --diff ./src ./tests",
+    "isort --settings-path .isort.cfg --check-only --diff ./src ./tests",
 ]
 code-format = [
-    "isort ./src ./tests",
+    "isort --settings-path .isort.cfg ./src ./tests",
     "black ./src ./tests",
     "code-check"
 ]
