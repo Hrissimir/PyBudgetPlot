@@ -7,7 +7,6 @@ omit =
 [paths]
 source =
     src/
-    tests/
 [report]
 exclude_lines =
     no cov
