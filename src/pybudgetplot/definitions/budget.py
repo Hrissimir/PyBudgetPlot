@@ -6,8 +6,8 @@ from typing import List, NamedTuple
 
 import yaml
 
-from pybudgetplot.definitions.event import Event, new_event
-from pybudgetplot.definitions.period import Period, new_period
+from pybudgetplot.definitions.event import Event
+from pybudgetplot.definitions.period import Period
 
 _log = logging.getLogger(__name__)
 _log.addHandler(logging.NullHandler())
@@ -34,7 +34,7 @@ class Budget(NamedTuple):
             period_start,
             period_end
         )
-        period = new_period(period_start, period_end)
+        period = Period.new(period_start, period_end)
         events = []
         result = cls(period, events)
         _log.debug("Budget.new - result: %r", result)
@@ -58,7 +58,7 @@ class Budget(NamedTuple):
             amount,
             frequency
         )
-        event = new_event(description, amount, frequency)
+        event = Event.new(description, amount, frequency)
         self.events.append(event)
         return event
 

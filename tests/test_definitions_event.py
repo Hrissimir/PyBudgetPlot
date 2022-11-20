@@ -2,7 +2,7 @@
 import logging
 from unittest import TestCase
 
-from pybudgetplot.definitions.event import Event, new_event, normalize_string, parse_amount
+from pybudgetplot.definitions.event import Event, normalize_string, parse_amount
 
 _log = logging.getLogger(__name__)
 _log.addHandler(logging.NullHandler())
@@ -65,20 +65,16 @@ class ParseAmountTests(TestCase):
         self.assertEqual(expected, actual)
 
 
-class NewEventTests(TestCase):
-    """Unit-tests for the `event.new_event` method."""
+class EventTests(TestCase):
+    """Unit-tests for the `Event` class."""
 
-    def test_given_valid_args_then_returns_instance_with_correct_values(self):
+    def test_new(self):
         desc_param = " evt \t \n desc \r"
         amount_param = "23.5"
         freq_param = "\n \t every day "
         expected = Event("evt desc", 23.5, "every day")
-        actual = new_event(desc_param, amount_param, freq_param)
+        actual = Event.new(desc_param, amount_param, freq_param)
         self.assertEqual(expected, actual)
-
-
-class EventTests(TestCase):
-    """Unit-tests for the `Event` class."""
 
     def test_as_dict(self):
         event = Event("evt desc", 23.5, "every day")

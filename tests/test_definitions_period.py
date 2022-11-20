@@ -9,7 +9,6 @@ from pybudgetplot.definitions.period import (
     Period,
     format_timestamp,
     is_datestamp,
-    new_period,
     parse_datestamp,
 )
 
@@ -118,22 +117,16 @@ class FormatTimestampTests(TestCase):
         self.assertTupleEqual(expected, actual)
 
 
-class NewPeriodTests(TestCase):
-    """Unit-tests for the `period.new_period` method."""
-
-    def test_given_str_params_when_valid_datetime_values_then_returns_period(self):
-        start = "2022-01-13 22:45:00"
-        end = "2022-02-24 00:23:00"
-        expected = Period(
-            Timestamp(year=2022, month=1, day=13).normalize(),
-            Timestamp(year=2022, month=2, day=24).normalize(),
-        )
-        actual = new_period(start, end)
-        self.assertEqual(expected, actual)
-
-
 class PeriodTests(TestCase):
     """Unit-tests for the `Period` class."""
+
+    def test_new(self):
+        expected = Period(
+            Timestamp(year=2022, month=1, day=13),
+            Timestamp(year=2022, month=2, day=24),
+        )
+        actual = Period.new("2022-01-13 22:45:00", "2022-02-24 00:23:00")
+        self.assertEqual(expected, actual)
 
     def test_as_dict(self):
         period = Period(
@@ -169,14 +162,14 @@ class PeriodTests(TestCase):
         self.assertEqual(expected, actual)
 
     def test_generate_dates_when_frequency_is_string_containing_date(self):
-        period = new_period("2022-05-01", "2022-05-05")
+        period = Period.new("2022-05-01", "2022-05-05")
         freq = "2022-05-01"
         expected = [Timestamp(year=2022, month=5, day=1).normalize()]
         actual = period.generate_dates(freq)
         self.assertListEqual(expected, actual)
 
     def test_generate_dates_when_frequency_is_string_containing_parsable_sentence(self):
-        period = new_period("2022-05-01", "2022-05-05")
+        period = Period.new("2022-05-01", "2022-05-05")
         freq = "every day starting 2022-05-03 until 2022-05-05"
         expected = [
             Timestamp(year=2022, month=5, day=3).normalize(),
@@ -187,7 +180,7 @@ class PeriodTests(TestCase):
         self.assertListEqual(expected, actual)
 
     def test_generate_dates_when_frequency_is_string_containing_non_parsable_sentence(self):
-        period = new_period("2022-05-01", "2022-05-05")
+        period = Period.new("2022-05-01", "2022-05-05")
         freq = "sometimes"
         with self.assertRaises(ValueError) as ctx:
             period.generate_dates(freq)

@@ -108,6 +108,30 @@ class Period(NamedTuple):
         end = format_timestamp(self.end_date)
         return f"['{start}' - '{end}']"
 
+    @classmethod
+    def new(cls, start, end) -> "Period":
+        """Helper method for creating new Period instances.
+
+        Parses the args to Timestamp objects before passing to the constructor.
+
+        Args:
+            start: Value for the period's start-date.
+            end: Value for the period's end-date.
+
+        Returns:
+            The newly-created Period instance.
+
+        Raises:
+            ValueError: Raised if the args could not be parsed to Timestamp.
+        """
+
+        _log.debug("Period.new - start: %r, end: %r", start, end)
+        start_date = parse_datestamp(start)
+        end_date = parse_datestamp(end)
+        result = Period(start_date, end_date)
+        _log.debug("new_period - result: %r", result)
+        return result
+
     def as_dict(self) -> dict:
         """Converts the current Period instance to dict.
 
@@ -166,27 +190,3 @@ class Period(NamedTuple):
 
         _log.debug("generate_dates - got [%d] dates: '%r'", len(result), result)
         return result
-
-
-def new_period(start, end) -> Period:
-    """Helper method for creating new Period instances.
-
-    Parses the args to Timestamp objects before passing them to the constructor.
-
-    Args:
-        start: Value for the period's start-date.
-        end: Value for the period's end-date.
-
-    Returns:
-        Period instance whose start-date and end-date are normalized Timestamps.
-
-    Raises:
-        ValueError: Raised if the args could not be parsed to Timestamp objects.
-    """
-
-    _log.debug("new_period - start: '%s', end: '%s'", start, end)
-    start_date = parse_datestamp(start)
-    end_date = parse_datestamp(end)
-    result = Period(start_date, end_date)
-    _log.debug("new_period - result: '%r'", result)
-    return result
