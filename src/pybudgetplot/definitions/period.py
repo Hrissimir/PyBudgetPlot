@@ -27,7 +27,7 @@ def is_datestamp(stamp: Timestamp) -> bool:
         TypeError: Raised if the 'stamp' param is not a Timestamp instance.
     """
 
-    _log.debug("is_datestamp - stamp: '%s'", stamp)
+    _log.debug("is_datestamp - stamp: '%r'", stamp)
 
     if not isinstance(stamp, Timestamp):
         _log.warning("is_datestamp - unsupported param-type!")
@@ -75,7 +75,7 @@ def parse_datestamp(value) -> Timestamp:
     if not is_datestamp(result):
         result = result.normalize()
 
-    _log.debug("parse_datestamp - result: '%s'", result)
+    _log.debug("parse_datestamp - result: '%r'", result)
     return result
 
 
@@ -92,15 +92,9 @@ def format_timestamp(stamp: Timestamp) -> str:
         The resulting string.
     """
 
-    _log.debug("format_timestamp - stamp: '%s'", stamp)
-
     if is_datestamp(stamp):
-        result = stamp.date().isoformat()
-    else:
-        result = str(stamp)
-
-    _log.debug("format_timestamp - result: '%s'", result)
-    return result
+        return stamp.date().isoformat()
+    return str(stamp)
 
 
 class Period(NamedTuple):
@@ -170,7 +164,7 @@ class Period(NamedTuple):
                 _log.warning("generate_dates - the frequency could not parsed!")
                 raise ValueError(frequency) from ex
 
-        _log.debug("generate_dates - got [%s] dates: '%s'", len(result), result)
+        _log.debug("generate_dates - got [%d] dates: '%r'", len(result), result)
         return result
 
 
@@ -194,5 +188,5 @@ def new_period(start, end) -> Period:
     start_date = parse_datestamp(start)
     end_date = parse_datestamp(end)
     result = Period(start_date, end_date)
-    _log.debug("new_period - result: '%s'", result)
+    _log.debug("new_period - result: '%r'", result)
     return result
