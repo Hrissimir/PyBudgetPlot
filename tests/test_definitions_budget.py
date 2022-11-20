@@ -70,3 +70,41 @@ class BudgetTests(TestCase):
         )
         actual = budget.as_yaml()
         self.assertEqual(expected, actual)
+
+    def test_from_dict(self):
+        data = {
+            "period": {
+                "start_date": "2022-01-01",
+                "end_date": "2022-01-31",
+            },
+            "events": [
+                {
+                    "description": "event desc",
+                    "amount": "23.50",
+                    "frequency": "every day"
+                },
+            ],
+        }
+
+        expected = Budget.new("2022-01-01", "2022-01-31")
+        expected.add_event("event desc", 23.5, "every day")
+        actual = Budget.from_dict(data)
+        self.assertEqual(expected, actual)
+
+    def test_from_yaml(self):
+        text = dedent(
+            """\
+            period:
+                start_date: '2022-01-01'
+                end_date: '2022-12-31'
+            events:
+            -   description: salary
+                amount: '2345.60'
+                frequency: every month
+            """
+        )
+
+        expected = Budget.new("2022-01-01", "2022-12-31")
+        expected.add_event("salary", 2345.6, "every month")
+        actual = Budget.from_yaml(text)
+        self.assertEqual(expected, actual)
