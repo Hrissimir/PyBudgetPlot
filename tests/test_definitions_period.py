@@ -1,20 +1,17 @@
 """Unit-tests for the `pybudgetplot.definitions.period` module."""
-
+import re
+from datetime import date, datetime
 from unittest import TestCase
 
 from pandas import Timestamp
 
-from pybudgetplot.definitions.period import (
-    PARSABLE_STAMP_TYPES,
-    Period,
-    format_timestamp,
-    is_datestamp,
-    parse_datestamp,
-)
+from pybudgetplot.definitions.period import Period, format_stamp, is_datestamp, parse_datestamp, parse_timestamp
+
+REGEX_FLAGS = re.DOTALL | re.IGNORECASE
 
 
 class IsDatestampTests(TestCase):
-    """Unit-tests for the `period.is_datestamp` method."""
+    """Unit-tests for the `is_datestamp` method."""
 
     def test_given_bad_param_type_then_raises_type_error(self):
         stamp = object()
@@ -37,32 +34,130 @@ class IsDatestampTests(TestCase):
         self.assertTrue(is_datestamp(stamp))
 
 
-class ParseDatestampTests(TestCase):
-    """Unit-tests for the `period.parse_datestamp` method."""
+class ParseTimestampTests(TestCase):
+    """Unit-tests for the `parse_timestamp` method."""
 
-    def test_given_bad_param_type_then_raises_type_error(self):
-        value = object()
-        with self.assertRaises(TypeError) as ctx:
-            parse_datestamp(value)
-        expected_args = (value, PARSABLE_STAMP_TYPES, object)
-        actual_args = ctx.exception.args
-        self.assertTupleEqual(expected_args, actual_args)
-
-    def test_given_none_then_raises_type_error(self):
+    def test_given_none_then_raises_value_error(self):
         value = None
-        with self.assertRaises(TypeError) as ctx:
-            parse_datestamp(value)
-        expected_args = (value, PARSABLE_STAMP_TYPES, type(None))
-        actual_args = ctx.exception.args
-        self.assertTupleEqual(expected_args, actual_args)
+        regex = r"can't parse None to Timestamp"
+        pattern = re.compile(regex, REGEX_FLAGS)
+        self.assertRaisesRegex(ValueError, pattern, parse_timestamp, value)
 
-    def test_given_str_when_not_parsable_then_raises_value_error(self):
-        value = "bad value"
-        with self.assertRaises(ValueError) as ctx:
-            parse_datestamp(value)
-        expected_args = (value,)
-        actual_args = ctx.exception.args
-        self.assertTupleEqual(expected_args, actual_args)
+    def test_given_bad_type_then_raises_value_error(self):
+        value = object()
+        regex = r"error while parsing \<object object at .*\> to Timestamp"
+        pattern = re.compile(regex, REGEX_FLAGS)
+        self.assertRaisesRegex(ValueError, pattern, parse_timestamp, value)
+
+    def test_given_date_instance_then_returns_timestamp(self):
+        value = date(2022, 1, 23)
+        expected = Timestamp(year=2022, month=1, day=23)
+        actual = parse_timestamp(value)
+        self.assertIsInstance(actual, Timestamp)
+        self.assertEqual(expected, actual)
+
+    def test_given_datetime_instance_then_returns_timestamp(self):
+        value = datetime(2022, 11, 21, 1, 15, 20, 170705)
+        expected = Timestamp(
+            year=2022,
+            month=11,
+            day=21,
+            hour=1,
+            minute=15,
+            second=20,
+            microsecond=170705
+        )
+        actual = parse_timestamp(value)
+        self.assertIsInstance(actual, Timestamp)
+        self.assertEqual(expected, actual)
+
+    def test_given_float_when_valid_timestamp_value_then_returns_utc_timestamp(self):
+        value = 1668993320.170705
+        expected = Timestamp(
+            year=2022,
+            month=11,
+            day=21,
+            hour=1,
+            minute=15,
+            second=20,
+            microsecond=170705
+        )
+        actual = parse_timestamp(value)
+        self.assertIsInstance(actual, Timestamp)
+        self.assertEqual(expected, actual)
+
+    def test_given_float_when_invalid_timestamp_value_then_raises_value_error(self):
+        value = -1668993320.170705
+        regex = r"error while parsing -1668993320.170705 to Timestamp"
+        pattern = re.compile(regex, REGEX_FLAGS)
+        self.assertRaisesRegex(ValueError, pattern, parse_timestamp, value)
+
+    def test_given_int_when_valid_timestamp_value_then_returns_utc_timestamp(self):
+        value = 1668993320
+        expected = Timestamp(
+            year=2022,
+            month=11,
+            day=21,
+            hour=1,
+            minute=15,
+            second=20,
+        )
+        actual = parse_timestamp(value)
+        self.assertIsInstance(actual, Timestamp)
+        self.assertEqual(expected, actual)
+
+    def test_given_int_when_invalid_timestamp_value_then_raises_value_error(self):
+        value = -1668993320
+        regex = r"error while parsing -1668993320 to Timestamp"
+        pattern = re.compile(regex, REGEX_FLAGS)
+        self.assertRaisesRegex(ValueError, pattern, parse_timestamp, value)
+
+    def test_given_str_when_invalid_value_then_raises_value_error(self):
+        value = "nope!"
+        regex = r"error while parsing 'nope!' to Timestamp"
+        pattern = re.compile(regex, REGEX_FLAGS)
+        self.assertRaisesRegex(ValueError, pattern, parse_timestamp, value)
+
+    def test_given_str_when_isodate_then_returns_timestamp(self):
+        value = "2022-01-01"
+        expected = Timestamp(year=2022, month=1, day=1)
+        actual = parse_timestamp(value)
+        self.assertIsInstance(actual, Timestamp)
+        self.assertEqual(expected, actual)
+
+    def test_given_str_when_isodatetime_then_returns_timestamp(self):
+        value = "2022-11-21T01:15:20.170705"
+        expected = Timestamp(
+            year=2022,
+            month=11,
+            day=21,
+            hour=1,
+            minute=15,
+            second=20,
+            microsecond=170705
+        )
+        actual = parse_timestamp(value)
+        self.assertIsInstance(actual, Timestamp)
+        self.assertEqual(expected, actual)
+
+    def test_given_timestamp_then_returns_same_object(self):
+        value = Timestamp.now()
+        self.assertIs(value, parse_timestamp(value))
+
+
+class ParseDatestampTests(TestCase):
+    """Unit-tests for the `parse_datestamp` method."""
+
+    def test_given_non_normalized_timestamp_then_returns_datestamp(self):
+        value = Timestamp(year=2022, month=5, day=13, hour=10)
+        expected = Timestamp(year=2022, month=5, day=13)
+        actual = parse_datestamp(value)
+        self.assertEqual(expected, actual)
+
+    def test_given_normalized_timestamp_then_returns_same_object(self):
+        value = Timestamp(year=2022, month=5, day=13)
+        result = parse_datestamp(value)
+        self.assertIs(value, result)
 
     def test_given_str_when_parsable_date_then_returns_timestamp(self):
         value = "2022-05-13"
@@ -70,75 +165,52 @@ class ParseDatestampTests(TestCase):
         actual = parse_datestamp(value)
         self.assertEqual(expected, actual)
 
-    def test_given_str_when_parsable_datetime_then_returns_timestamp(self):
+    def test_given_str_when_parsable_datetime_then_returns_datestamp(self):
         value = "2022-05-13 09:30:00"
-        expected = Timestamp(year=2022, month=5, day=13).normalize()
-        actual = parse_datestamp(value)
-        self.assertEqual(expected, actual)
-
-        value = "2022-05-13 00:00:00"
-        expected = Timestamp(year=2022, month=5, day=13).normalize()
-        actual = parse_datestamp(value)
-        self.assertEqual(expected, actual)
-
-    def test_given_timestamp_when_normalized_then_returns_same_object(self):
-        value = Timestamp(year=2022, month=5, day=13)
-        result = parse_datestamp(value)
-        self.assertIs(value, result)
-
-    def test_given_timestamp_when_non_normalized_then_returns_normalized_timestamp(self):
-        value = Timestamp(year=2022, month=5, day=13, hour=10)
         expected = Timestamp(year=2022, month=5, day=13)
         actual = parse_datestamp(value)
         self.assertEqual(expected, actual)
 
 
-class FormatTimestampTests(TestCase):
-    """Unit-tests for the `period.format_timestamp` method."""
-
-    def test_given_timestamp_when_non_normalized_then_returns_datetime_string(self):
-        stamp = Timestamp(year=2022, month=1, day=2, hour=3, minute=4, microsecond=5)
-        expected = "2022-01-02 03:04:00.000005"
-        actual = format_timestamp(stamp)
-        self.assertEqual(expected, actual)
-
-    def test_given_timestamp_when_normalized_then_returns_iso_format_date_string(self):
-        stamp = Timestamp(year=2022, month=1, day=2).normalize()
-        expected = "2022-01-02"
-        actual = format_timestamp(stamp)
-        self.assertEqual(expected, actual)
+class FormatStampTests(TestCase):
+    """Unit-tests for the `format_stamp` method."""
 
     def test_given_bad_param_type_then_raises_type_error(self):
         stamp = object()
         with self.assertRaises(TypeError) as ctx:
-            format_timestamp(stamp)  # noqa
+            format_stamp(stamp)  # noqa
         expected = (stamp, Timestamp, object)
         actual = ctx.exception.args
         self.assertTupleEqual(expected, actual)
+
+    def test_given_non_normalized_stamp_then_returns_iso_datetime(self):
+        stamp = Timestamp(year=2022, month=1, day=2, hour=3, minute=4, microsecond=5)
+        expected = "2022-01-02T03:04:00.000005"
+        actual = format_stamp(stamp)
+        self.assertEqual(expected, actual)
+
+    def test_given_normalized_stamp_then_returns_iso_date(self):
+        stamp = Timestamp(year=2022, month=1, day=2).normalize()
+        expected = "2022-01-02"
+        actual = format_stamp(stamp)
+        self.assertEqual(expected, actual)
 
 
 class PeriodTests(TestCase):
     """Unit-tests for the `Period` class."""
 
-    def test_new(self):
+    def test_constructor(self):
         expected = Period(
-            Timestamp(year=2022, month=1, day=13),
-            Timestamp(year=2022, month=2, day=24),
+            Timestamp(year=2022, month=1, day=13, hour=22, minute=45),
+            Timestamp(year=2022, month=2, day=24, minute=23),
         )
-        actual = Period.new("2022-01-13 22:45:00", "2022-02-24 00:23:00")
+        actual = Period("2022-01-13 22:45:00", "2022-02-24 00:23:00")
         self.assertEqual(expected, actual)
 
-    def test_as_dict(self):
-        period = Period(
-            Timestamp(year=2022, month=1, day=13).normalize(),
-            Timestamp(year=2022, month=2, day=24).normalize(),
-        )
-        expected = {
-            "start_date": "2022-01-13",
-            "end_date": "2022-02-24",
-        }
-        actual = period.as_dict()
-        self.assertDictEqual(expected, actual)
+    def test_eq(self):
+        current = Period("2022-01-13 22:45:00", "2022-02-24 00:23:00")
+        other = object()
+        self.assertFalse(current == other)
 
     def test_repr(self):
         start = Timestamp(year=2022, month=1, day=10).normalize()
@@ -146,8 +218,8 @@ class PeriodTests(TestCase):
         period = Period(start, end)
         expected = (
             "Period("
-            "start_date=Timestamp('2022-01-10 00:00:00'), "
-            "end_date=Timestamp('2022-02-20 00:00:00')"
+            "start=Timestamp('2022-01-10 00:00:00'), "
+            "end=Timestamp('2022-02-20 00:00:00')"
             ")"
         )
         actual = repr(period)
@@ -157,33 +229,54 @@ class PeriodTests(TestCase):
         start = Timestamp(year=2022, month=1, day=10)
         end = Timestamp(year=2022, month=2, day=20, hour=2, microsecond=2)
         period = Period(start, end)
-        expected = "['2022-01-10' - '2022-02-20 02:00:00.000002']"
+        expected = "['2022-01-10' - '2022-02-20T02:00:00.000002']"
         actual = str(period)
         self.assertEqual(expected, actual)
 
-    def test_generate_dates_when_frequency_is_string_containing_date(self):
-        period = Period.new("2022-05-01", "2022-05-05")
+    def test_as_dict(self):
+        period = Period(
+            Timestamp(year=2022, month=1, day=13),
+            Timestamp(year=2022, month=2, day=24),
+        )
+        expected = {
+            "start": Timestamp(year=2022, month=1, day=13),
+            "end": Timestamp(year=2022, month=2, day=24),
+        }
+        actual = period.as_dict()
+        self.assertDictEqual(expected, actual)
+
+    def test_generate_datestamps_from_bad_param_type(self):
+        period = Period("2022-05-01", "2022-05-05")
+        freq = object()
+        with self.assertRaises(TypeError) as ctx:
+            period.generate_datestamps(freq)  # noqa
+        expected = (freq, str, object)
+        actual = ctx.exception.args
+        self.assertTupleEqual(expected, actual)
+
+    def test_generate_datestamps_from_isoformat_date(self):
+        period = Period("2022-05-01", "2022-05-05")
         freq = "2022-05-01"
-        expected = [Timestamp(year=2022, month=5, day=1).normalize()]
-        actual = period.generate_dates(freq)
+        expected = [Timestamp(year=2022, month=5, day=1)]
+        actual = period.generate_datestamps(freq)
         self.assertListEqual(expected, actual)
 
-    def test_generate_dates_when_frequency_is_string_containing_parsable_sentence(self):
-        period = Period.new("2022-05-01", "2022-05-05")
-        freq = "every day starting 2022-05-03 until 2022-05-05"
-        expected = [
-            Timestamp(year=2022, month=5, day=3).normalize(),
-            Timestamp(year=2022, month=5, day=4).normalize(),
-            Timestamp(year=2022, month=5, day=5).normalize(),
-        ]
-        actual = period.generate_dates(freq)
-        self.assertListEqual(expected, actual)
-
-    def test_generate_dates_when_frequency_is_string_containing_non_parsable_sentence(self):
-        period = Period.new("2022-05-01", "2022-05-05")
+    def test_generate_datestamps_from_non_parsable_sentence(self):
+        period = Period("2022-05-01", "2022-05-05")
         freq = "sometimes"
         with self.assertRaises(ValueError) as ctx:
-            period.generate_dates(freq)
+            period.generate_datestamps(freq)
         expected = (freq,)
         actual = ctx.exception.args
         self.assertTupleEqual(expected, actual)
+
+    def test_generate_datestamps_from_parsable_sentence(self):
+        period = Period("2022-05-01", "2022-05-05")
+        freq = "every day starting 2022-05-03 until 2022-05-05"
+        expected = [
+            Timestamp(year=2022, month=5, day=3),
+            Timestamp(year=2022, month=5, day=4),
+            Timestamp(year=2022, month=5, day=5),
+        ]
+        actual = period.generate_datestamps(freq)
+        self.assertListEqual(expected, actual)

@@ -1,192 +1,182 @@
 """This module defines the data and logic for processing a period definition."""
-import logging
 import warnings
-from datetime import date, datetime
-from typing import List, NamedTuple
+from typing import Any, List
 
 from dateutil import rrule
 from pandas import Timestamp
 from recurrent import RecurringEvent
 
-_log = logging.getLogger(__name__)
-_log.addHandler(logging.NullHandler())
-
-PARSABLE_STAMP_TYPES = (int, str, date, datetime, Timestamp)
-
 
 def is_datestamp(stamp: Timestamp) -> bool:
-    """Checks if a Timestamp is normalized (e.g. 'date-stamp').
+    """Checks if a ``Timestamp`` is normalized (e.g. 'date-stamp').
 
     Args:
         stamp: Timestamp instance.
 
     Returns:
-        True if the Timestamp contains only date-related data, False otherwise.
+        True if the stamp contains only date-related data, False otherwise.
 
     Raises:
-        TypeError: Raised if the 'stamp' param is not a Timestamp instance.
+        TypeError: Raised if the stamp is not a Timestamp instance.
     """
 
-    _log.debug("is_datestamp - stamp: '%r'", stamp)
-
     if not isinstance(stamp, Timestamp):
-        _log.warning("is_datestamp - unsupported param-type!")
         raise TypeError(stamp, Timestamp, type(stamp))
 
-    result = (
+    return (
             (stamp.hour == 0)
             and (stamp.minute == 0)
             and (stamp.second == 0)
             and (stamp.microsecond == 0)
     )
 
-    _log.debug("is_datestamp - result: '%s'", result)
-    return result
 
+def parse_timestamp(value: Any) -> Timestamp:
+    """Parse any value to ``Timestamp`` instance.
 
-def parse_datestamp(value) -> Timestamp:
-    """Parse a value to a 'normalized' Timestamp (e.g. 'date-stamp').
+    If the value is already a ``Timestamp``, the same object is returned.
+
+    If the value is ``int`` or ``float``, it's treated as UTC-based POSIX stamp.
 
     Args:
-        value: Any value that can be parsed to Timestamp by Pandas.
+        value: Any value that can be parsed to Timestamp.
 
     Returns:
-          Timestamp instance pointing to midnight of a given date.
+        The parsed Timestamp instance or raises.
 
     Raises:
-         TypeError: Raised if the param type is not supported.
-         ValueError: Raised if the value could not be parsed.
+        ValueError: Raised if the value is None or if it could not be parsed.
     """
 
-    _log.debug("parse_datestamp - value: '%s'", value)
-
-    if not isinstance(value, PARSABLE_STAMP_TYPES):
-        raise TypeError(value, PARSABLE_STAMP_TYPES, type(value))
+    if value is None:
+        raise ValueError("Can't parse None to Timestamp!")
 
     if isinstance(value, Timestamp):
-        result = value
+        return value
+
+    try:
+        if isinstance(value, (int, float)):
+            return Timestamp.utcfromtimestamp(value)
+        return Timestamp(value)
+    except Exception as ex:
+        raise ValueError(f"Error while parsing {value!r} to Timestamp!") from ex
+
+
+def parse_datestamp(value: Any) -> Timestamp:
+    """Parse any value to normalized ``Timestamp`` (e.g. 'date-stamp').
+
+    Args:
+        value: Any value that can be parsed to Timestamp by `parse_timestamp`.
+
+    Returns:
+          Timestamp instance with only date-related data or raises.
+
+    Raises:
+         ValueError: Raised if the value is None or could not be parsed.
+    """
+
+    if isinstance(value, Timestamp):
+        stamp = value
     else:
-        try:
-            result = Timestamp(value)
-        except Exception as ex:
-            _log.warning("parse_datestamp - failed to parse by all means!")
-            raise ValueError(value) from ex
+        stamp = parse_timestamp(value)
 
-    if not is_datestamp(result):
-        result = result.normalize()
-
-    _log.debug("parse_datestamp - result: '%r'", result)
-    return result
+    return stamp if is_datestamp(stamp) else stamp.normalize()
 
 
-def format_timestamp(stamp: Timestamp) -> str:
-    """Format a Timestamp to string.
+def format_stamp(stamp: Timestamp) -> str:
+    """Formats a ``Timestamp`` instance to string using ISO format.
 
-    If the Timestamp is 'normalized', the resulting string is in ISO-dateformat,
-    otherwise the result of the default Timestamp.__str__() is returned.
+    If the stamp is 'date-stamp', the result is as if calling `date.isoformat`,
+    otherwise the result is as if `datetime.isoformat` was called.
 
     Args:
         stamp: Timestamp instance.
 
     Returns:
-        The resulting string.
+        String containing date or datetime in ISO format.
+
+    Raises:
+        TypeError: Raised if the stamp is not a Timestamp instance.
     """
 
     if is_datestamp(stamp):
         return stamp.date().isoformat()
-    return str(stamp)
+    return stamp.isoformat()
 
 
-class Period(NamedTuple):
-    """Represent all dates in the period between the start-date and end-date."""
+class Period:
+    """Represents the fixed period of time between 'start' and 'end' stamps."""
 
-    start_date: Timestamp
-    end_date: Timestamp
+    def __init__(self, start: Any, end: Any):
+        self.start = parse_timestamp(start)
+        self.end = parse_timestamp(end)
+
+    def __eq__(self, other) -> bool:
+        if isinstance(other, Period):
+            return (self.start == other.start) and (self.end == other.end)
+        return False
+
+    def __repr__(self) -> str:
+        return f"{type(self).__name__}(start={self.start!r}, end={self.end!r})"
 
     def __str__(self) -> str:
-        start = format_timestamp(self.start_date)
-        end = format_timestamp(self.end_date)
-        return f"['{start}' - '{end}']"
-
-    @classmethod
-    def new(cls, start, end) -> "Period":
-        """Helper method for creating new Period instances.
-
-        Parses the args to Timestamp objects before passing to the constructor.
-
-        Args:
-            start: Value for the period's start-date.
-            end: Value for the period's end-date.
-
-        Returns:
-            The newly-created Period instance.
-
-        Raises:
-            ValueError: Raised if the args could not be parsed to Timestamp.
-        """
-
-        _log.debug("Period.new - start: %r, end: %r", start, end)
-        start_date = parse_datestamp(start)
-        end_date = parse_datestamp(end)
-        result = Period(start_date, end_date)
-        _log.debug("new_period - result: %r", result)
-        return result
+        start_str = format_stamp(self.start)
+        end_str = format_stamp(self.end)
+        return f"['{start_str}' - '{end_str}']"
 
     def as_dict(self) -> dict:
-        """Converts the current Period instance to dict.
-
-        Returns:
-            Dict with the period data, whose values are the dates in ISO-format.
-        """
-
         return {
-            "start_date": format_timestamp(self.start_date),
-            "end_date": format_timestamp(self.end_date),
+            "start": self.start,
+            "end": self.end,
         }
 
-    def generate_dates(self, frequency: str) -> List[Timestamp]:
-        """Generate a list of dates in the period with the given frequency.
+    def generate_datestamps(self, frequency: str) -> List[Timestamp]:
+        """Generates a list of 'date-stamps' with the given frequency.
 
         Args:
-            frequency: Sentence describing a frequency or date in ISO-format.
+            frequency: Sentence describing the frequency, or date in ISO-format.
 
         Returns:
-            List of normalized Timestamps referring to dates in the period.
+            List of normalized Timestamps referring to dates in the Period.
 
         Raises:
+            TypeError: Raised if the frequency is not a string instance.
             ValueError: Raised if the frequency could not be parsed.
         """
 
-        _log.debug("generate_dates - frequency: '%s'", frequency)
+        if not isinstance(frequency, str):
+            raise TypeError(frequency, str, type(frequency))
 
-        # check to see if the frequency can be parsed to a single date.
         try:
+            # check if the frequency can be parsed to a single date-stamp.
             result = [parse_datestamp(frequency)]
         except ValueError:
             result = None
 
         if result is None:
 
-            # try to parse the frequency using the 'recurrent' lib
+            # ensure that `date-stamps` are used for the calculations
+            start_date = parse_datestamp(self.start)
+            end_date = parse_datestamp(self.end)
+
             try:
+                # silence `parsedatetime` warning due bad call from `recurrent`
                 with warnings.catch_warnings():
                     warnings.simplefilter("ignore")
-                    event = RecurringEvent()
-                    event.parse(frequency)
-                    rule = rrule.rrulestr(event.get_RFC_rrule())
 
-                    # ensure all Timestamps are normalized.
+                    event = RecurringEvent(now_date=start_date)
+                    event.parse(frequency)
+
+                    rfc_rrule = event.get_RFC_rrule()
+                    rule = rrule.rrulestr(rfc_rrule, dtstart=start_date)
+
                     result = [
                         Timestamp(occurrence).normalize()
                         for occurrence
-                        in rule.between(
-                            self.start_date, self.end_date, inc=True
-                        )
+                        in rule.between(start_date, end_date, inc=True)
                     ]
 
             except Exception as ex:
-                _log.warning("generate_dates - the frequency could not parsed!")
                 raise ValueError(frequency) from ex
 
-        _log.debug("generate_dates - got [%d] dates: '%r'", len(result), result)
         return result
