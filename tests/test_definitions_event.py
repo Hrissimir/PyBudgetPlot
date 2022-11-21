@@ -14,7 +14,7 @@ class NormalizeStringTests(TestCase):
     def test_given_bad_type_param_then_raises_type_error(self):
         value = object()
         with self.assertRaises(TypeError) as ctx:
-            normalize_string(value)
+            normalize_string(value)  # noqa
         expected = (value, str, object)
         actual = ctx.exception.args
         self.assertTupleEqual(expected, actual)
@@ -68,19 +68,31 @@ class ParseAmountTests(TestCase):
 class EventTests(TestCase):
     """Unit-tests for the `Event` class."""
 
-    def test_new(self):
+    def test_constructor(self):
         desc_param = " evt \t \n desc \r"
         amount_param = "23.5"
         freq_param = "\n \t every day "
         expected = Event("evt desc", 23.5, "every day")
-        actual = Event.new(desc_param, amount_param, freq_param)
+        actual = Event(desc_param, amount_param, freq_param)
         self.assertEqual(expected, actual)
+
+    def test_repr(self):
+        event = Event("evt desc", 23.5, "every day")
+        expected = \
+            "Event(description='evt desc', amount=23.5, frequency='every day')"
+        actual = repr(event)
+        self.assertEqual(expected, actual)
+
+    def test_eq(self):
+        current = Event("evt desc", 23.5, "every day")
+        other = object()
+        self.assertFalse(current == other)
 
     def test_as_dict(self):
         event = Event("evt desc", 23.5, "every day")
         expected = {
             "description": "evt desc",
-            "amount": "23.50",
+            "amount": 23.50,
             "frequency": "every day"
         }
         actual = event.as_dict()

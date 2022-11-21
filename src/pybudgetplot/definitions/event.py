@@ -1,108 +1,95 @@
 """This module defines the data and logic for processing an event definition."""
-import logging
 import re
-from typing import NamedTuple
 
-_log = logging.getLogger(__name__)
-_log.addHandler(logging.NullHandler())
+REGEX_WS_FLAGS = (re.DOTALL | re.IGNORECASE | re.MULTILINE)
+REGEX_WS_PATTERN = re.compile(r"\s+", REGEX_WS_FLAGS)
 
 
-def normalize_string(value) -> str:
+def normalize_string(value: str) -> str:
     """Normalize a string value.
 
     Args:
-        value: Usually a sentence containing an event description or frequency.
+        value: String containing Event description or frequency.
 
     Returns:
-        Non-empty, stripped string with normalized whitespace.
+        Non-empty, stripped string with normalized whitespaces or raises.
 
     Raises:
-        TypeError: Raised if the value is not a string instance.
-        ValueError: Raised if the resulting string is empty.
+        TypeError: Raised if the param value is not a string.
+        ValueError: Raised if the result value is empty string.
     """
 
-    _log.debug("normalize_string - value: %r", value)
-
     if not isinstance(value, str):
-        _log.warning("normalize_string - bad param type!")
         raise TypeError(value, str, type(value))
 
-    result = re.sub(r"\s+", " ", value).strip()
+    result = REGEX_WS_PATTERN.sub(" ", value).strip()
     if not result:
-        _log.warning("normalize_string - the resulting string is empty!")
         raise ValueError(value)
 
-    _log.debug("normalize_string - result: %r", result)
     return result
 
 
 def parse_amount(value) -> float:
-    """Parse value of event amount.
+    """Parse amount value to float.
 
     Args:
-        value: Any value parsable to float.
+        value: Event amount.
 
     Returns:
-        Float with the parsed value or raises.
+        The parsed float or raises.
 
     Raises:
-        ValueError: Raised if the value could not be parsed to float.
+        ValueError: Raised if the value could not be parsed.
     """
 
-    _log.debug("parse_amount - value: %r", value)
+    if isinstance(value, float):
+        return value
+
     try:
-        if isinstance(value, float):
-            result = value
-        else:
-            result = float(value)
-        _log.debug("parse_amount - result: %.2f", result)
-        return result
+        return float(value)
     except Exception as ex:
-        _log.warning("parse_amount - error: %r", ex)
         raise ValueError(value) from ex
 
 
-class Event(NamedTuple):
-    """Represents the definition of a budget event."""
+class Event:
+    """Represents the data-definition of recurring 'budget-event'."""
 
     description: str
     amount: float
     frequency: str
 
-    @classmethod
-    def new(cls, description, amount, frequency) -> "Event":
-        """Helper method for creation of new Event instances.
-
-        This method processes the args before passing them to the constructor.
+    def __init__(self, description, amount, frequency):
+        """Class constructor.
 
         Args:
-            description: Short description of the event.
+            description: String with the event description.
             amount: Amount of money that comes or goes with each occurrence.
-            frequency: Frequency of the event occurrences.
-
-        Returns:
-            The newly-created Event instance.
+            frequency: String describing the frequency of the event occurrences.
         """
 
-        _log.debug(
-            "Event.new - description: %r, amount: %r, frequency: %r",
-            description,
-            amount,
-            frequency
+        self.description = normalize_string(description)
+        self.amount = parse_amount(amount)
+        self.frequency = normalize_string(frequency)
+
+    def __repr__(self) -> str:
+        return "%s(description=%r, amount=%r, frequency=%r)" % (
+            type(self).__name__, self.description, self.amount, self.frequency
         )
 
-        event_description = normalize_string(description)
-        event_amount = parse_amount(amount)
-        event_frequency = normalize_string(frequency)
-        result = Event(event_description, event_amount, event_frequency)
-        _log.debug("Event.new - result: %r", result)
-        return result
+    def __eq__(self, other) -> bool:
+        if isinstance(other, Event):
+            return (
+                    (self.description == other.description)
+                    and (self.amount == other.amount)
+                    and (self.frequency == other.frequency)
+            )
+        return False
 
     def as_dict(self) -> dict:
-        """Returns dict with the current event data."""
+        """Returns dict with the event data."""
 
         return {
             "description": self.description,
-            "amount": f"{self.amount:.2f}",
+            "amount": self.amount,
             "frequency": self.frequency
         }
