@@ -81,12 +81,12 @@ class BudgetTests(TestCase):
         expected = dedent(
             """\
             period:
-                start: '2022-01-01'
-                end: '2022-12-31'
+              start: '2022-01-01'
+              end: '2022-12-31'
             events:
-            -   description: salary
-                amount: '2345.60'
-                frequency: every month
+            - description: salary
+              amount: '2345.60'
+              frequency: every month
             """
         )
         actual = budget.as_yaml()
