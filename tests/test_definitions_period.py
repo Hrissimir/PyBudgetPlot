@@ -238,10 +238,7 @@ class PeriodTests(TestCase):
             Timestamp(year=2022, month=1, day=13),
             Timestamp(year=2022, month=2, day=24),
         )
-        expected = {
-            "start": Timestamp(year=2022, month=1, day=13),
-            "end": Timestamp(year=2022, month=2, day=24),
-        }
+        expected = {"start": "2022-01-13", "end": "2022-02-24"}
         actual = period.as_dict()
         self.assertDictEqual(expected, actual)
 

@@ -1,6 +1,6 @@
 """This module defines the data and logic for processing a period definition."""
 import warnings
-from typing import Any, List
+from typing import Any, Dict, List
 
 from dateutil import rrule
 from pandas import Timestamp
@@ -124,10 +124,10 @@ class Period:
         end_str = format_stamp(self.end)
         return f"['{start_str}' - '{end_str}']"
 
-    def as_dict(self) -> dict:
+    def as_dict(self) -> Dict[str, str]:
         return {
-            "start": self.start,
-            "end": self.end,
+            "start": format_stamp(self.start),
+            "end": format_stamp(self.end),
         }
 
     def generate_datestamps(self, frequency: str) -> List[Timestamp]:
