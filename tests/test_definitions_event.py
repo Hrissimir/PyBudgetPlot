@@ -1,15 +1,11 @@
 """Unit-tests for the `pybudgetplot.definitions.event` module."""
-import logging
 from unittest import TestCase
 
 from pybudgetplot.definitions.event import Event, normalize_string, parse_amount
 
-_log = logging.getLogger(__name__)
-_log.addHandler(logging.NullHandler())
-
 
 class NormalizeStringTests(TestCase):
-    """Unit-tests for the `event.normalize_string` method."""
+    """Unit-tests for the `normalize_string` method."""
 
     def test_given_bad_type_param_then_raises_type_error(self):
         value = object()
@@ -35,7 +31,7 @@ class NormalizeStringTests(TestCase):
 
 
 class ParseAmountTests(TestCase):
-    """Unit-tests for the `event.parse_amount` method."""
+    """Unit-tests for the `parse_amount` method."""
 
     def test_given_bad_type_param_then_raises_type_error(self):
         value = object()
@@ -92,7 +88,7 @@ class EventTests(TestCase):
         event = Event("evt desc", 23.5, "every day")
         expected = {
             "description": "evt desc",
-            "amount": 23.50,
+            "amount": "23.50",
             "frequency": "every day"
         }
         actual = event.as_dict()

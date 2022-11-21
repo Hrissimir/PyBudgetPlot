@@ -1,5 +1,6 @@
 """This module defines the data and logic for processing an event definition."""
 import re
+from typing import Dict
 
 REGEX_WS_FLAGS = (re.DOTALL | re.IGNORECASE | re.MULTILINE)
 REGEX_WS_PATTERN = re.compile(r"\s+", REGEX_WS_FLAGS)
@@ -85,11 +86,11 @@ class Event:
             )
         return False
 
-    def as_dict(self) -> dict:
+    def as_dict(self) -> Dict[str, str]:
         """Returns dict with the event data."""
 
         return {
             "description": self.description,
-            "amount": self.amount,
+            "amount": f"{self.amount:.2f}",
             "frequency": self.frequency
         }
