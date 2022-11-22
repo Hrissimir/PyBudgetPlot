@@ -1,40 +1,43 @@
+"""Helper module for plotting a budget to file or interactively."""
 import logging
-from pathlib import Path
-from typing import Optional
 
 from matplotlib import pyplot
 from pandas import DataFrame
 from pandas.plotting import register_matplotlib_converters
 
+from pybudgetplot.datamodel.budget import Budget
+
 logging.getLogger("PIL.PngImagePlugin").disabled = True
 logging.getLogger("matplotlib.font_manager").disabled = True
+
 register_matplotlib_converters()
 
-GRAPH_SIZE = (16, 9)
-GRAPH_LABEL_DAILY = "Daily Total"
-GRAPH_LABEL_CUMULATIVE = "Cumulative Total"
+_FIG_NUM = 42
+_FIG_WIDTH = 16
+_FIG_HEIGHT = 9
 
-_graph: Optional[pyplot.Figure] = None
+_LABEL_DAILY = "Daily Total"
+_LABEL_CUMULATIVE = "Cumulative Total"
 
 
-def plot_graph(data: DataFrame):
-    """Plots a graph from the given budget breakdown data."""
+def _draw_figure(data: DataFrame):
+    """Draws graph of the 'daily_total' and 'cumulative_total' data values."""
 
-    global _graph
-    _graph = pyplot.figure(figsize=GRAPH_SIZE)
-    pyplot.plot(data.index, data.daily_total, label=GRAPH_LABEL_DAILY)
-    pyplot.plot(data.index, data.cumulative_total, label=GRAPH_LABEL_CUMULATIVE)
+    pyplot.figure(num=_FIG_NUM, figsize=(_FIG_WIDTH, _FIG_HEIGHT), clear=True)
+    pyplot.plot(data.index, data.cumulative_total, label=_LABEL_CUMULATIVE)
+    pyplot.plot(data.index, data.daily_total, label=_LABEL_DAILY)
     pyplot.legend()
 
 
-def save_graph(file: Path):
-    """Writes the currently plotted graph to the file."""
+def plot_budget(budget: Budget, *, file=None, interactive=False):
+    """Plots the budget to file or interactively or both."""
 
-    global _graph  # pylint: disable=global-variable-not-assigned
-    _graph.savefig(file)
+    data = budget.as_dataframe()
 
+    _draw_figure(data)
 
-def show_graph():
-    """Shows the currently plotted graph in interactive mode."""
+    if file is not None:
+        pyplot.savefig(file)
 
-    pyplot.show()
+    if interactive:
+        pyplot.show()
