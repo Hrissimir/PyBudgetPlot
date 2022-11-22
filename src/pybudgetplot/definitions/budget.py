@@ -1,12 +1,25 @@
 """This module defines the data and logic for processing a budget definition."""
 
-from io import StringIO
+from io import BytesIO, StringIO
 from typing import Dict, List, Union
 
 import yaml
+from pandas import DataFrame, DatetimeIndex, Series, concat, date_range, set_option
 
 from pybudgetplot.definitions.event import Event
 from pybudgetplot.definitions.period import Period
+
+set_option("display.date_yearfirst", True)
+set_option("display.float_format", lambda f: ("%.2f" % f))
+set_option("display.max_columns", None)
+set_option("display.max_rows", 200)
+set_option("display.min_rows", 20)
+set_option("display.precision", 2)
+set_option("display.show_dimensions", True)
+set_option("display.width", 1920)
+set_option("expand_frame_repr", False)
+set_option("max_colwidth", 20)
+set_option("io.excel.xlsx.writer", "xlsxwriter")
 
 
 class Budget:
@@ -29,6 +42,33 @@ class Budget:
                     and (self.events == other.events)
             )
         return False
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "Budget":
+        """Creates and returns new Budget instance from dict data."""
+
+        period_data = data["period"]
+        period_start = period_data["start"]
+        period_end = period_data["end"]
+
+        result = Budget(period_start, period_end)
+
+        events_data = data["events"]
+        for event in events_data:
+            description = event["description"]
+            amount = event["amount"]
+            frequency = event["frequency"]
+            result.add_event(description, amount, frequency)
+
+        return result
+
+    @classmethod
+    def from_yaml(cls, text: str) -> "Budget":
+        """Creates new Budget instance from string containing YAML data."""
+
+        buffer = StringIO(text)
+        data = yaml.load(buffer, Loader=yaml.SafeLoader)
+        return cls.from_dict(data)
 
     def add_event(self, description, amount, frequency) -> Event:
         """Create and add Event to the list of events.
@@ -75,29 +115,47 @@ class Budget:
         )
         return buffer.getvalue()
 
-    @classmethod
-    def from_dict(cls, data: dict) -> "Budget":
-        """Creates and returns new Budget instance from dict data."""
+    def as_dataframe(self) -> DataFrame:
+        """Calculates the daily breakdown and returns the data."""
 
-        period_data = data["period"]
-        period_start = period_data["start_date"]
-        period_end = period_data["end_date"]
+        data = DataFrame(
+            index=date_range(
+                start=self.period.start.normalize(),
+                end=self.period.end.normalize(),
+            )
+        )
 
-        result = Budget(period_start, period_end)
+        for event in self.events:
+            event_dates = self.period.generate_datestamps(event.frequency)
+            event_data = DataFrame(
+                data={
+                    event.description: event.amount,
+                },
+                index=DatetimeIndex(
+                    Series(event_dates, dtype=object)
+                )
+            )
+            data = concat([data, event_data], axis=1).fillna(0.00)
 
-        events_data = data["events"]
-        for event in events_data:
-            description = event["description"]
-            amount = event["amount"]
-            frequency = event["frequency"]
-            result.add_event(description, amount, frequency)
+        data["daily_total"] = data.sum(axis=1)
+        data["cumulative_total"] = data["daily_total"].cumsum()
+        data.index.rename("date", inplace=True)
+        return data
 
-        return result
+    def as_csv(self) -> bytes:
+        """Returns the daily breakdown data as CSV bytes."""
 
-    @classmethod
-    def from_yaml(cls, text: str) -> "Budget":
-        """Creates new Budget instance from string containing YAML data."""
-
-        buffer = StringIO(text)
-        data = yaml.load(buffer, Loader=yaml.SafeLoader)
-        return cls.from_dict(data)
+        buffer = BytesIO()
+        data = self.as_dataframe()
+        data.to_csv(
+            buffer,
+            float_format="%.2f",
+            index=True,
+            index_label="date",
+            mode="b",
+            encoding="utf-8",
+            errors="surrogateescape",
+            line_terminator="\n",
+            date_format="%Y-%m-%d",
+        )
+        return buffer.getvalue()

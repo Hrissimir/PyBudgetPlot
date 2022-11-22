@@ -121,7 +121,7 @@ class Breakdown:
         ]
 
     def to_csv(self) -> bytes:
-        """Returns string with CSV data of the current Breakdown instance."""
+        """Returns with the daily breakdown data in CSV bytes."""
 
         buffer = BytesIO()
         self._data.to_csv(
