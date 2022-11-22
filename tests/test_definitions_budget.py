@@ -7,8 +7,10 @@ from pandas import Timestamp
 from pybudgetplot.definitions.budget import Budget
 from pybudgetplot.definitions.event import Event
 from pybudgetplot.definitions.period import Period
+from pybudgetplot.utils.file_util import read_bytes, read_str
 
 BUDGET = Budget("2020-11-01", "2020-12-31")
+BUDGET.add_event("Cash", 200, "2020-11-01")
 BUDGET.add_event("Salary", 1300, "Every Month starting 2020-11-03")
 BUDGET.add_event("Rent", -450, "Every Month starting 2020-11-15")
 BUDGET.add_event("WaterBill", -30, "Every Month starting 2020-11-08")
@@ -19,7 +21,6 @@ BUDGET.add_event("Commute", -5, "Every WeekDay")
 BUDGET.add_event("Tobacco", -15, "Every Week")
 BUDGET.add_event("Snacks", -10, "Every 3 Days")
 BUDGET.add_event("Party", -20, "Every 2 weeks on Friday and Saturday")
-BUDGET.add_event("Cash", 200, "2020-11-01")
 
 SAMPLES_DIR = Path(__file__).parent.joinpath("samples").absolute().resolve()
 
@@ -114,30 +115,34 @@ class BudgetTests(TestCase):
 
     def test_as_yaml(self):
         sample_file = SAMPLES_DIR.joinpath("budget.yaml")
-        expected_bytes = sample_file.read_bytes()
-        expected_str = expected_bytes.decode("utf-8", errors="surrogateescape")
+        expected_str = read_str(sample_file)
         actual_str = BUDGET.as_yaml()
         self.assertEqual(expected_str, actual_str)
 
     def test_from_yaml(self):
-        yaml_file = SAMPLES_DIR.joinpath("budget.yaml")
-        yaml_bytes = yaml_file.read_bytes()
-        yaml_str = yaml_bytes.decode("utf-8", errors="surrogateescape")
+        sample_file = SAMPLES_DIR.joinpath("budget.yaml")
+        yaml_str = read_str(sample_file)
         expected = BUDGET
         actual = Budget.from_yaml(yaml_str)
         self.assertEqual(expected, actual)
 
+    def test_as_dataframe(self):
+        sample_file = SAMPLES_DIR.joinpath("budget.txt")
+        expected_str = read_str(sample_file)
+        data = BUDGET.as_dataframe()
+        actual_str = str(data)
+        self.assertEqual(expected_str, actual_str)
+
     def test_to_csv(self):
         sample_file = SAMPLES_DIR.joinpath("budget.csv")
-        expected_bytes = sample_file.read_bytes()
-        expected_str = expected_bytes.decode("utf-8", errors="surrogateescape")
+        expected_str = read_str(sample_file)
         actual_bytes = BUDGET.to_csv()
         actual_str = actual_bytes.decode("utf-8", errors="surrogateescape")
         self.assertEqual(expected_str, actual_str)
 
     def test_to_xlsx(self):
         sample_file = SAMPLES_DIR.joinpath("budget.xlsx")
-        expected_bytes = sample_file.read_bytes()
+        expected_bytes = read_bytes(sample_file)
         expected_bytes_count = len(expected_bytes)
 
         # confirm the size of the sample-file is ~11kb

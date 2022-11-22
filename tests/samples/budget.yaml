@@ -2,6 +2,9 @@ period:
   start: '2020-11-01'
   end: '2020-12-31'
 events:
+- description: Cash
+  amount: '200.00'
+  frequency: '2020-11-01'
 - description: Salary
   amount: '1300.00'
   frequency: Every Month starting 2020-11-03
@@ -32,6 +35,3 @@ events:
 - description: Party
   amount: '-20.00'
   frequency: Every 2 weeks on Friday and Saturday
-- description: Cash
-  amount: '200.00'
-  frequency: '2020-11-01'
