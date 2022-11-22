@@ -2,7 +2,7 @@
 import re
 from typing import Dict
 
-REGEX_WS_FLAGS = (re.DOTALL | re.IGNORECASE | re.MULTILINE)
+REGEX_WS_FLAGS = re.DOTALL | re.IGNORECASE | re.MULTILINE
 REGEX_WS_PATTERN = re.compile(r"\s+", REGEX_WS_FLAGS)
 
 
@@ -74,15 +74,18 @@ class Event:
 
     def __repr__(self) -> str:
         return "%s(description=%r, amount=%r, frequency=%r)" % (
-            type(self).__name__, self.description, self.amount, self.frequency
+            type(self).__name__,
+            self.description,
+            self.amount,
+            self.frequency,
         )
 
     def __eq__(self, other) -> bool:
         if isinstance(other, Event):
             return (
-                    (self.description == other.description)
-                    and (self.amount == other.amount)
-                    and (self.frequency == other.frequency)
+                (self.description == other.description)
+                and (self.amount == other.amount)
+                and (self.frequency == other.frequency)
             )
         return False
 
@@ -92,5 +95,5 @@ class Event:
         return {
             "description": self.description,
             "amount": f"{self.amount:.2f}",
-            "frequency": self.frequency
+            "frequency": self.frequency,
         }

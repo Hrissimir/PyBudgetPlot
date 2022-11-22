@@ -87,9 +87,7 @@ def generate_xlsx(data: DataFrame, sheet_name="Breakdown") -> bytes:
 
     # extract the rows data
     rows_data = [
-        ([item[0].date()] + [float(_) for _ in item[1:]])
-        for item
-        in data.itertuples()
+        ([item[0].date()] + [float(_) for _ in item[1:]]) for item in data.itertuples()
     ]
 
     # replace the values of all 'daily' and 'cumulative' cells with formulas
@@ -102,8 +100,7 @@ def generate_xlsx(data: DataFrame, sheet_name="Breakdown") -> bytes:
         cumulative_formula = f"={daily_cell}"
         if row_index > 1:
             previous_row_cumulative_cell = xl_rowcol_to_cell(
-                row_index - 1,
-                idx_cumulative
+                row_index - 1, idx_cumulative
             )
             cumulative_formula += f"+{previous_row_cumulative_cell}"
         row_cells[idx_cumulative] = cumulative_formula  # noqa
@@ -113,10 +110,9 @@ def generate_xlsx(data: DataFrame, sheet_name="Breakdown") -> bytes:
         {
             "header": col_name,
             "header_format": fmt_header,
-            "format": get_cell_format(col_idx)
+            "format": get_cell_format(col_idx),
         }
-        for (col_idx, col_name)
-        in enumerate(column_names)
+        for (col_idx, col_name) in enumerate(column_names)
     ]
 
     # add a 'totals' row at the bottom of the Excel table

@@ -106,7 +106,9 @@ def init(file):
     ),
     required=True,
 )
-def plot(csv: bool, png: bool, txt: bool, xlsx: bool, interactive: bool, yaml_file: Path):
+def plot(
+    csv: bool, png: bool, txt: bool, xlsx: bool, interactive: bool, yaml_file: Path
+):
     """Plot a budget-definition .yaml file."""
 
     file = Path(yaml_file).absolute().resolve(strict=True)

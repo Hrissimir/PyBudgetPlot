@@ -21,9 +21,9 @@ class PlotBudgetTests(TestCase):
     @patch("matplotlib.pyplot.show", autospec=True)
     @patch("matplotlib.pyplot.savefig", autospec=True)
     def test_plot_both_to_file_and_interactive(
-            self,
-            mock_savefig: MagicMock,
-            mock_show: MagicMock,
+        self,
+        mock_savefig: MagicMock,
+        mock_show: MagicMock,
     ):
         file = Path(__file__).parent.joinpath("graph.png")
         plot_budget(BUDGET, file=file, interactive=True)
@@ -37,9 +37,9 @@ class PlotBudgetTests(TestCase):
     @patch("matplotlib.pyplot.show", autospec=True)
     @patch("matplotlib.pyplot.savefig", autospec=True)
     def test_plot_interactive_only(
-            self,
-            mock_savefig: MagicMock,
-            mock_show: MagicMock,
+        self,
+        mock_savefig: MagicMock,
+        mock_show: MagicMock,
     ):
         plot_budget(BUDGET, interactive=True)
         mock_savefig.assert_not_called()

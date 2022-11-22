@@ -30,6 +30,13 @@ class Budget:
     events: List[Event]
 
     def __init__(self, period_start, period_end):
+        """Class constructor.
+
+        Args:
+            period_start: Value for the budget period's start-date.
+            period_end: Value for the budget period's end-date.
+        """
+
         self.period = Period(period_start, period_end)
         self.events = []
 
@@ -38,10 +45,7 @@ class Budget:
 
     def __eq__(self, other) -> bool:
         if isinstance(other, Budget):
-            return (
-                    (self.period == other.period)
-                    and (self.events == other.events)
-            )
+            return (self.period == other.period) and (self.events == other.events)
         return False
 
     @classmethod
@@ -91,11 +95,7 @@ class Budget:
 
         return {
             "period": self.period.as_dict(),
-            "events": [
-                event.as_dict()
-                for event
-                in self.events
-            ]
+            "events": [event.as_dict() for event in self.events],
         }
 
     def as_yaml(self) -> str:
@@ -132,9 +132,7 @@ class Budget:
                 data={
                     event.description: event.amount,
                 },
-                index=DatetimeIndex(
-                    Series(event_dates, dtype=object)
-                )
+                index=DatetimeIndex(Series(event_dates, dtype=object)),
             )
             data = concat([data, event_data], axis=1).fillna(0.00)
 

@@ -74,8 +74,7 @@ class EventTests(TestCase):
 
     def test_repr(self):
         event = Event("evt desc", 23.5, "every day")
-        expected = \
-            "Event(description='evt desc', amount=23.5, frequency='every day')"
+        expected = "Event(description='evt desc', amount=23.5, frequency='every day')"
         actual = repr(event)
         self.assertEqual(expected, actual)
 
@@ -89,7 +88,7 @@ class EventTests(TestCase):
         expected = {
             "description": "evt desc",
             "amount": "23.50",
-            "frequency": "every day"
+            "frequency": "every day",
         }
         actual = event.as_dict()
         self.assertDictEqual(expected, actual)

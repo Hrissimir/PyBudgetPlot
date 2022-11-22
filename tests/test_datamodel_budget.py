@@ -35,8 +35,7 @@ class BudgetTests(TestCase):
         self.assertIsInstance(budget.events, list)
 
         expected_period = Period(
-            Timestamp(year=2022, month=1, day=1),
-            Timestamp(year=2022, month=1, day=31)
+            Timestamp(year=2022, month=1, day=1), Timestamp(year=2022, month=1, day=31)
         )
         actual_period = budget.period
         self.assertEqual(expected_period, actual_period)
@@ -49,9 +48,7 @@ class BudgetTests(TestCase):
         budget = Budget("2022-01-01", "2022-01-31")
         budget.add_event("event desc", 23.5, "every day")
         expected = (
-            "Budget("
-            f"period={repr(budget.period)}, events={repr(budget.events)}"
-            ")"
+            "Budget(" f"period={repr(budget.period)}, events={repr(budget.events)}" ")"
         )
         actual = repr(budget)
         self.assertEqual(expected, actual)
@@ -86,7 +83,7 @@ class BudgetTests(TestCase):
                 {
                     "description": "event desc",
                     "amount": "23.50",
-                    "frequency": "every day"
+                    "frequency": "every day",
                 },
             ],
         }
@@ -103,7 +100,7 @@ class BudgetTests(TestCase):
                 {
                     "description": "event desc",
                     "amount": "23.50",
-                    "frequency": "every day"
+                    "frequency": "every day",
                 },
             ],
         }
@@ -160,8 +157,4 @@ class BudgetTests(TestCase):
         self.assertGreaterEqual(expected_bytes_count, 10 * 1000)
 
         # confirm the sample and actual result have minor difference in size
-        self.assertAlmostEqual(
-            expected_bytes_count,
-            actual_bytes_count,
-            delta=500
-        )
+        self.assertAlmostEqual(expected_bytes_count, actual_bytes_count, delta=500)

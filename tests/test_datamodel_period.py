@@ -22,15 +22,11 @@ class IsDatestampTests(TestCase):
         self.assertTupleEqual(expected, actual)
 
     def test_given_non_normalized_timestamp_then_returns_false(self):
-        stamp = Timestamp(
-            year=2022, month=1, day=2, hour=0, minute=0, microsecond=1
-        )
+        stamp = Timestamp(year=2022, month=1, day=2, hour=0, minute=0, microsecond=1)
         self.assertFalse(is_datestamp(stamp))
 
     def test_given_normalized_timestamp_then_returns_true(self):
-        stamp = Timestamp(
-            year=2022, month=1, day=2, hour=0, minute=0, microsecond=0
-        )
+        stamp = Timestamp(year=2022, month=1, day=2, hour=0, minute=0, microsecond=0)
         self.assertTrue(is_datestamp(stamp))
 
 
@@ -65,7 +61,7 @@ class ParseTimestampTests(TestCase):
             hour=1,
             minute=15,
             second=20,
-            microsecond=170705
+            microsecond=170705,
         )
         actual = parse_timestamp(value)
         self.assertIsInstance(actual, Timestamp)
@@ -80,7 +76,7 @@ class ParseTimestampTests(TestCase):
             hour=1,
             minute=15,
             second=20,
-            microsecond=170705
+            microsecond=170705,
         )
         actual = parse_timestamp(value)
         self.assertIsInstance(actual, Timestamp)
@@ -134,7 +130,7 @@ class ParseTimestampTests(TestCase):
             hour=1,
             minute=15,
             second=20,
-            microsecond=170705
+            microsecond=170705,
         )
         actual = parse_timestamp(value)
         self.assertIsInstance(actual, Timestamp)

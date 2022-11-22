@@ -24,10 +24,10 @@ def is_datestamp(stamp: Timestamp) -> bool:
         raise TypeError(stamp, Timestamp, type(stamp))
 
     return (
-            (stamp.hour == 0)
-            and (stamp.minute == 0)
-            and (stamp.second == 0)
-            and (stamp.microsecond == 0)
+        (stamp.hour == 0)
+        and (stamp.minute == 0)
+        and (stamp.second == 0)
+        and (stamp.microsecond == 0)
     )
 
 
@@ -108,6 +108,13 @@ class Period:
     """Represents the fixed period of time between 'start' and 'end' stamps."""
 
     def __init__(self, start: Any, end: Any):
+        """Class constructor.
+
+        Args:
+            start: Period start date/datetime.
+            end: Period end date/datetime.
+        """
+
         self.start = parse_timestamp(start)
         self.end = parse_timestamp(end)
 
@@ -125,6 +132,7 @@ class Period:
         return f"['{start_str}' - '{end_str}']"
 
     def as_dict(self) -> Dict[str, str]:
+        """Returns the period data in a dict string-only values."""
         return {
             "start": format_stamp(self.start),
             "end": format_stamp(self.end),
@@ -172,8 +180,7 @@ class Period:
 
                     result = [
                         Timestamp(occurrence).normalize()
-                        for occurrence
-                        in rule.between(start_date, end_date, inc=True)
+                        for occurrence in rule.between(start_date, end_date, inc=True)
                     ]
 
             except Exception as ex:
