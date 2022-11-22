@@ -14,6 +14,7 @@
 - [Overview](#overview)
 - [Installation](#installation)
 - [Usage](#usage)
+- [CLI Commands](#cli-commands)
 - [License](#license)
 
 -----
@@ -62,56 +63,99 @@ The *definition* file is used as input for the following operations:
 * Plotting (line-chart) graph visualization of the daily and cumulative totals.
     * The output can be saved as PNG or an *interactive* plotter can be opened.
 
+Two budgets and their outputs are included in the ['examples'](examples) dir.
+
+The difference between 1300 and 1500 salary in the long-term can be surprising.
+
+
 -----
 
 ## Installation
 
-The project can be installed from PyPI using the following command:
+The project can be installed from PyPI using the following commands:
 
-```console
+```shell
+# Windows - open admin-level CMD and run:
 pip install pybudgetplot
+
+# Linux / MacOS - open user-level Terminal and run:
+pip3 install --user pybudgetplot
 ```
 
 -----
 
 ## Usage
 
-### 1. *Initialize* a sample *'budget-definition'* file.
+### 1. Init a sample budget-definition file.
 
 ```shell
-budget-init  # creates a 'budget.yaml' file in the current work-dir
-
-budget-init -h  # shows all command options and usage instructions
+# generates budget.yaml file in the current dir
+budget init budget.yaml
 ```
 
-### 2. *Update* the sample *'budget-definition'* file.
+### 2. Update the file as per your needs and save the changes.
 
-The file contains several examples of how a *'budget-event'* can be defined.
-
-Use them to define your own list of *'budget-events'* that you want to plot.
-
-### 3. *Calculate* the budget *'daily'* and *'cumulative'* totals.
-
-During the calculation:
-
-* A list of all dates for the period is generated
-* The *frequency* of each *budget-event* is parsed to list of dates
-* The *event-amount* is added to each date that falls inside the period
-* The *daily-total* value for each day is calculated by summing-up all amounts
-* The *cumulative-total* value for each date is calculated based on previous day
+### 3. Generate outputs in one or all of the supported formats.
 
 ```shell
-budget-calc  # reads the budget.yaml file and generates a budget.xlsx file
-
-budget-calc -h  # shows all command options and usage instructions
+# generates budget.csv, budget.png, budget.txt, budget.xlsx files in current dir
+budget plot -c -p -t -x budget.yaml
 ```
 
-### 4. *Plot* a visualization of the calculated *daily* and *cumulative* totals.
+-----
+
+## CLI Commands
 
 ```shell
-budget-plot  # reads the budget.yaml file and generates a budget.png file
+# ------------------------------------------------------------------------------
+# see the 'budget' command help
+# ------------------------------------------------------------------------------
+> budget -h
 
-budget-plot -h  # shows all command options and usage instructions
+    Usage: budget [OPTIONS] COMMAND [ARGS]...
+
+      Composite CLI command for managing a 'budget-definition' file.
+
+    Options:
+      --version   Show the version and exit.
+      -h, --help  Show this message and exit.
+
+    Commands:
+      init  Initialize a budget definition file with sample contents.
+      plot  Plot a budget-definition .yaml file.
+
+# ------------------------------------------------------------------------------
+# see the 'budget init' command help
+# ------------------------------------------------------------------------------
+> budget init -h
+
+    Usage: budget init [OPTIONS] [FILE]
+
+      Initialize a budget definition file with sample contents.
+
+    Options:
+      -h, --help  Show this message and exit.
+
+# ------------------------------------------------------------------------------
+# see the 'budget plot' command help
+# ------------------------------------------------------------------------------
+> budget plot -h
+
+    Usage: budget plot [OPTIONS] YAML_FILE
+
+      Plot a budget-definition .yaml file.
+
+    Options:
+      -c, --csv          Write .CSV with the breakdown next to definition file.
+      -p, --png          Write .PNG with the graph next to definition file.
+      -t, --txt          Write .TXT with the breakdown next to definition file.
+      -x, --xlsx         Write .XLSX with the breakdown next to definition file.
+      -i, --interactive  Enter interactive plot mode.
+      -h, --help         Show this message and exit.
+
+# ------------------------------------------------------------------------------
+# That's all folks!
+# ------------------------------------------------------------------------------
 ```
 
 -----
