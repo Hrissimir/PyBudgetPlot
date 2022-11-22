@@ -1,0 +1,37 @@
+period:
+  start: '2020-11-01'
+  end: '2021-10-31'
+events:
+- description: Cash
+  amount: '200.00'
+  frequency: '2020-11-01'
+- description: Salary
+  amount: '1500.00'
+  frequency: Every Month starting 2020-11-03
+- description: Rent
+  amount: '-450.00'
+  frequency: Every Month starting 2020-11-15
+- description: WaterBill
+  amount: '-30.00'
+  frequency: Every Month starting 2020-11-08
+- description: PowerBill
+  amount: '-60.00'
+  frequency: Every Month starting 2020-11-07
+- description: PhoneBill
+  amount: '-25.00'
+  frequency: Every Month starting 2020-11-06
+- description: Food
+  amount: '-15.00'
+  frequency: Every day
+- description: Commute
+  amount: '-5.00'
+  frequency: Every WeekDay
+- description: Tobacco
+  amount: '-15.00'
+  frequency: Every Week
+- description: Snacks
+  amount: '-10.00'
+  frequency: Every 3 Days
+- description: Party
+  amount: '-20.00'
+  frequency: Every 2 weeks on Friday and Saturday
