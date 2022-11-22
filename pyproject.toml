@@ -16,7 +16,7 @@ maintainers = [
     { name = "Hrissimir", email = "hrisimir.dakov@gmail.com" },
 ]
 classifiers = [
-    "Development Status :: 4 - Beta",
+    "Development Status :: 5 - Production/Stable",
     "Environment :: Console",
     "Intended Audience :: Education",
     "Intended Audience :: End Users/Desktop",
