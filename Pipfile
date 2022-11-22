@@ -35,7 +35,7 @@ flake8-builtins = ">=2.0.0"
 flake8-comprehensions = ">=3.10.0"
 
 [scripts]
-clean= 'python -c "import shutil;shutil.rmtree(\"dist\", True);shutil.rmtree(\"site\", True)"'
+clean = 'python -c "import shutil;shutil.rmtree(\"dist\", True);shutil.rmtree(\"site\", True)"'
 code-check = "hatch run code-check"
 code-format = "hatch run code-format"
 test = "hatch run cov"
