@@ -5,7 +5,7 @@ from unittest import TestCase
 
 from pandas import Timestamp
 
-from pybudgetplot.definitions.period import Period, format_stamp, is_datestamp, parse_datestamp, parse_timestamp
+from pybudgetplot.datamodel.period import Period, format_stamp, is_datestamp, parse_datestamp, parse_timestamp
 
 REGEX_FLAGS = re.DOTALL | re.IGNORECASE
 

@@ -1,7 +1,7 @@
 """Unit-tests for the `pybudgetplot.definitions.event` module."""
 from unittest import TestCase
 
-from pybudgetplot.definitions.event import Event, normalize_string, parse_amount
+from pybudgetplot.datamodel.event import Event, normalize_string, parse_amount
 
 
 class NormalizeStringTests(TestCase):

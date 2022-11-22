@@ -4,9 +4,9 @@ from unittest import TestCase
 
 from pandas import Timestamp
 
-from pybudgetplot.definitions.budget import Budget
-from pybudgetplot.definitions.event import Event
-from pybudgetplot.definitions.period import Period
+from pybudgetplot.datamodel.budget import Budget
+from pybudgetplot.datamodel.event import Event
+from pybudgetplot.datamodel.period import Period
 from pybudgetplot.utils.file_util import read_bytes, read_str
 
 BUDGET = Budget("2020-11-01", "2020-12-31")

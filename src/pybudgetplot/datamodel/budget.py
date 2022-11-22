@@ -6,8 +6,8 @@ from typing import Dict, List, Union
 import yaml
 from pandas import DataFrame, DatetimeIndex, Series, concat, date_range, set_option
 
-from pybudgetplot.definitions.event import Event
-from pybudgetplot.definitions.period import Period
+from pybudgetplot.datamodel.event import Event
+from pybudgetplot.datamodel.period import Period
 from pybudgetplot.utils.xlsx_util import generate_xlsx
 
 set_option("display.date_yearfirst", True)
