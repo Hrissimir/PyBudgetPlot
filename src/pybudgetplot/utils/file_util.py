@@ -17,7 +17,8 @@ def read_str(file, encoding="utf-8", errors="surrogateescape") -> str:
     """Reads file as string."""
 
     file_bytes = read_bytes(file)
-    return file_bytes.decode(encoding=encoding, errors=errors)
+    file_text = file_bytes.decode(encoding=encoding, errors=errors)
+    return file_text.replace("\r\n", "\n")
 
 
 def write_bytes(file, data: bytes):
