@@ -2,32 +2,27 @@
 #
 # SPDX-License-Identifier: MIT
 from pathlib import Path
-from textwrap import dedent
 
 import click
 
-from pybudgetplot.datamodel import BudgetDefinition
-from pybudgetplot.utils import plot_util
+from pybudgetplot.datamodel.budget import Budget
+from pybudgetplot.utils.file_util import read_str, write_bytes, write_str
+from pybudgetplot.utils.plot_util import plot_budget
 
 from ..__about__ import __version__  # pylint: disable=relative-beyond-top-level
 
-SAMPLE_YAML = dedent(
-    """\
-    PERIOD:
-        start: '2021-12-31'
-        end: '2022-01-05'
-    ITEMS:
-        cash:
-            amount: 200
-            frequency: '2021-12-31'
-        food:
-            amount: -5
-            frequency: every day starting 2022-01-01
-        commute:
-            amount: -1
-            frequency: every day starting 2022-01-02 until 2022-01-04
-    """
-)
+SAMPLE_BUDGET = Budget("2020-11-01", "2020-12-31")
+SAMPLE_BUDGET.add_event("Cash", 200, "2020-11-01")
+SAMPLE_BUDGET.add_event("Salary", 1300, "Every Month starting 2020-11-03")
+SAMPLE_BUDGET.add_event("Rent", -450, "Every Month starting 2020-11-15")
+SAMPLE_BUDGET.add_event("WaterBill", -30, "Every Month starting 2020-11-08")
+SAMPLE_BUDGET.add_event("PowerBill", -60, "Every Month starting 2020-11-07")
+SAMPLE_BUDGET.add_event("PhoneBill", -25, "Every Month starting 2020-11-06")
+SAMPLE_BUDGET.add_event("Food", -15, "Every day")
+SAMPLE_BUDGET.add_event("Commute", -5, "Every WeekDay")
+SAMPLE_BUDGET.add_event("Tobacco", -15, "Every Week")
+SAMPLE_BUDGET.add_event("Snacks", -10, "Every 3 Days")
+SAMPLE_BUDGET.add_event("Party", -20, "Every 2 weeks on Friday and Saturday")
 
 
 @click.group(
@@ -57,7 +52,8 @@ def cli():
 def init(file):
     """Initialize a budget definition file with sample contents."""
 
-    file.write(SAMPLE_YAML)
+    sample_yaml = SAMPLE_BUDGET.as_yaml()
+    write_str(file, sample_yaml)
 
 
 @cli.command()
@@ -106,31 +102,29 @@ def init(file):
 def plot(interactive: bool, png: bool, csv: bool, xlsx: bool, yaml_file: Path):
     """Plot a budget-definition .yaml file."""
 
-    file = yaml_file.absolute().resolve()
-    text = file.read_text(encoding="utf-8", errors="surrogateescape")
-    budget = BudgetDefinition.from_yaml(text)
-    breakdown = budget.calculate_breakdown()
-
+    file = Path(yaml_file).absolute().resolve(strict=True)
     folder = file.parent
+
+    text = read_str(file)
+    budget = Budget.from_yaml(text)
 
     if csv:
         csv_file = folder.joinpath(f"{file.stem}.csv")
         csv_bytes = budget.to_csv()
-        csv_file.write_bytes(csv_bytes)
+        write_bytes(csv_file, csv_bytes)
 
     if xlsx:
         xlsx_file = folder.joinpath(f"{file.stem}.xlsx")
         xlsx_bytes = budget.to_xlsx()
-        xlsx_file.write_bytes(xlsx_bytes)
+        write_bytes(xlsx_file, xlsx_bytes)
 
     if (not interactive) and (not png):
         return
 
-    plot_util.plot_graph(breakdown)
-
     if png:
         png_file = folder.joinpath(f"{file.stem}.png")
-        plot_util.save_graph(png_file)
+    else:
+        png_file = None
 
-    if interactive:
-        plot_util.show_graph()
+    if interactive or png_file:
+        plot_budget(budget, interactive=interactive, file=png_file)
