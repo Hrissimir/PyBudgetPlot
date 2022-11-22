@@ -74,6 +74,8 @@ class BudgetTests(TestCase):
     def test_as_dict(self):
         budget = Budget("2022-01-01", "2022-01-31")
         budget.add_event("event desc", 23.5, "every day")
+
+        # ensure the resulting dict contains string-only data
         expected = {
             "period": {
                 "start": "2022-01-01",
@@ -125,10 +127,30 @@ class BudgetTests(TestCase):
         actual = Budget.from_yaml(yaml_str)
         self.assertEqual(expected, actual)
 
-    def test_as_csv(self):
+    def test_to_csv(self):
         sample_file = SAMPLES_DIR.joinpath("budget.csv")
         expected_bytes = sample_file.read_bytes()
         expected_str = expected_bytes.decode("utf-8", errors="surrogateescape")
-        actual_bytes = BUDGET.as_csv()
+        actual_bytes = BUDGET.to_csv()
         actual_str = actual_bytes.decode("utf-8", errors="surrogateescape")
         self.assertEqual(expected_str, actual_str)
+
+    def test_to_xlsx(self):
+        sample_file = SAMPLES_DIR.joinpath("budget.xlsx")
+        expected_bytes = sample_file.read_bytes()
+        expected_bytes_count = len(expected_bytes)
+
+        # confirm the size of the sample-file is ~11kb
+        self.assertGreaterEqual(expected_bytes_count, 10 * 1000)
+
+        # confirm the result has similar size to the sample-file
+        actual_bytes = BUDGET.to_xlsx()
+        actual_bytes_count = len(actual_bytes)
+        self.assertGreaterEqual(expected_bytes_count, 10 * 1000)
+
+        # confirm the sample and actual result have minor difference in size
+        self.assertAlmostEqual(
+            expected_bytes_count,
+            actual_bytes_count,
+            delta=500
+        )

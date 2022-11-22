@@ -8,6 +8,7 @@ from pandas import DataFrame, DatetimeIndex, Series, concat, date_range, set_opt
 
 from pybudgetplot.definitions.event import Event
 from pybudgetplot.definitions.period import Period
+from pybudgetplot.utils.xlsx_util import generate_xlsx
 
 set_option("display.date_yearfirst", True)
 set_option("display.float_format", lambda f: ("%.2f" % f))
@@ -142,7 +143,7 @@ class Budget:
         data.index.rename("date", inplace=True)
         return data
 
-    def as_csv(self) -> bytes:
+    def to_csv(self) -> bytes:
         """Returns the daily breakdown data as CSV bytes."""
 
         buffer = BytesIO()
@@ -159,3 +160,9 @@ class Budget:
             date_format="%Y-%m-%d",
         )
         return buffer.getvalue()
+
+    def to_xlsx(self) -> bytes:
+        """Returns XLSX document containing table with the breakdown data."""
+
+        data = self.as_dataframe()
+        return generate_xlsx(data)

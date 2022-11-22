@@ -168,10 +168,10 @@ class Breakdown:
 
             return fmt_event
 
-        rows_data = self.rows_data
+        rows = self.rows_data
 
         # add_formulas_to_rows
-        for current_row_idx, current_row in enumerate(rows_data, start=1):
+        for current_row_idx, current_row in enumerate(rows, start=1):
             first_event_cell = xl_rowcol_to_cell(current_row_idx, 1)
             last_event_cell = xl_rowcol_to_cell(current_row_idx, idx_total - 1)
             total_formula = f"=SUM({first_event_cell}:{last_event_cell})"
@@ -206,11 +206,11 @@ class Breakdown:
             "last_column": True,
             "banded_columns": True,
             "banded_rows": False,
-            "data": rows_data,
+            "data": rows,
             "columns": table_columns,
         }
 
-        worksheet.add_table(0, 0, len(rows_data) + 1, idx_cum_total, table)
+        worksheet.add_table(0, 0, len(rows) + 1, idx_cum_total, table)
 
         # add_config_to_sheet
         worksheet.freeze_panes(1, 1)
