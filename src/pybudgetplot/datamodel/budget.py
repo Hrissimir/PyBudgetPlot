@@ -13,13 +13,13 @@ from pybudgetplot.utils.xlsx_util import generate_xlsx
 set_option("display.date_yearfirst", True)
 set_option("display.float_format", lambda f: ("%.2f" % f))
 set_option("display.max_columns", None)
-set_option("display.max_rows", 200)
-set_option("display.min_rows", 20)
+set_option("display.max_rows", None)
+set_option("display.min_rows", None)
 set_option("display.precision", 2)
 set_option("display.show_dimensions", True)
 set_option("display.width", 1920)
 set_option("expand_frame_repr", False)
-set_option("max_colwidth", 20)
+set_option("max_colwidth", 50)
 set_option("io.excel.xlsx.writer", "xlsxwriter")
 
 
@@ -160,6 +160,12 @@ class Budget:
             date_format="%Y-%m-%d",
         )
         return buffer.getvalue()
+
+    def to_txt(self) -> str:
+        """Returns the budget breakdown data as text table."""
+
+        data = self.as_dataframe()
+        return str(data)
 
     def to_xlsx(self) -> bytes:
         """Returns XLSX document containing table with the breakdown data."""

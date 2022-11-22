@@ -140,6 +140,12 @@ class BudgetTests(TestCase):
         actual_str = actual_bytes.decode("utf-8", errors="surrogateescape")
         self.assertEqual(expected_str, actual_str)
 
+    def test_to_txt(self):
+        sample_file = SAMPLES_DIR.joinpath("budget.txt")
+        expected_str = read_str(sample_file)
+        actual_str = BUDGET.to_txt()
+        self.assertEqual(expected_str, actual_str)
+
     def test_to_xlsx(self):
         sample_file = SAMPLES_DIR.joinpath("budget.xlsx")
         expected_bytes = read_bytes(sample_file)

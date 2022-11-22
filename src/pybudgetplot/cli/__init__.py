@@ -53,16 +53,16 @@ def init(file):
     """Initialize a budget definition file with sample contents."""
 
     sample_yaml = SAMPLE_BUDGET.as_yaml()
-    write_str(file, sample_yaml)
+    click.echo(sample_yaml, file=file)
 
 
 @cli.command()
 @click.option(
-    "-i",
-    "--interactive",
+    "-c",
+    "--csv",
     is_flag=True,
     default=False,
-    help="Enter interactive plot mode.",
+    help="Write .CSV with the breakdown next to definition file.",
 )
 @click.option(
     "-p",
@@ -72,11 +72,11 @@ def init(file):
     help="Write .PNG with the graph next to definition file.",
 )
 @click.option(
-    "-c",
-    "--csv",
+    "-t",
+    "--txt",
     is_flag=True,
     default=False,
-    help="Write .CSV with the breakdown next to definition file.",
+    help="Write .TXT with the breakdown next to definition file.",
 )
 @click.option(
     "-x",
@@ -84,6 +84,13 @@ def init(file):
     is_flag=True,
     default=False,
     help="Write .XLSX with the breakdown next to definition file.",
+)
+@click.option(
+    "-i",
+    "--interactive",
+    is_flag=True,
+    default=False,
+    help="Enter interactive plot mode.",
 )
 @click.argument(
     "yaml_file",
@@ -99,7 +106,7 @@ def init(file):
     ),
     required=True,
 )
-def plot(interactive: bool, png: bool, csv: bool, xlsx: bool, yaml_file: Path):
+def plot(csv: bool, png: bool, txt: bool, xlsx: bool, interactive: bool, yaml_file: Path):
     """Plot a budget-definition .yaml file."""
 
     file = Path(yaml_file).absolute().resolve(strict=True)
@@ -113,13 +120,14 @@ def plot(interactive: bool, png: bool, csv: bool, xlsx: bool, yaml_file: Path):
         csv_bytes = budget.to_csv()
         write_bytes(csv_file, csv_bytes)
 
+    if txt:
+        txt_file = folder.joinpath(f"{file.stem}.txt")
+        write_str(txt_file, str(budget.as_dataframe()))
+
     if xlsx:
         xlsx_file = folder.joinpath(f"{file.stem}.xlsx")
         xlsx_bytes = budget.to_xlsx()
         write_bytes(xlsx_file, xlsx_bytes)
-
-    if (not interactive) and (not png):
-        return
 
     if png:
         png_file = folder.joinpath(f"{file.stem}.png")
