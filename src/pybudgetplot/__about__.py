@@ -2,4 +2,4 @@
 #
 # SPDX-License-Identifier: MIT
 """Defines the __version__ value that is used when building the project."""
-__version__ = "3.0.0rc13"
+__version__ = "3.0.0rc14"
