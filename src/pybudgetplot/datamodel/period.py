@@ -24,10 +24,10 @@ def is_datestamp(stamp: Timestamp) -> bool:
         raise TypeError(stamp, Timestamp, type(stamp))
 
     return (
-        (stamp.hour == 0)
-        and (stamp.minute == 0)
-        and (stamp.second == 0)
-        and (stamp.microsecond == 0)
+            (stamp.hour == 0)
+            and (stamp.minute == 0)
+            and (stamp.second == 0)
+            and (stamp.microsecond == 0)
     )
 
 
@@ -56,6 +56,8 @@ def parse_timestamp(value: Any) -> Timestamp:
 
     try:
         if isinstance(value, (int, float)):
+            if value <= 0:
+                raise ValueError(value)
             return Timestamp.utcfromtimestamp(value)
         return Timestamp(value)
     except Exception as ex:
