@@ -229,15 +229,6 @@ class PeriodTests(TestCase):
         actual = str(period)
         self.assertEqual(expected, actual)
 
-    def test_as_dict(self):
-        period = Period(
-            Timestamp(year=2022, month=1, day=13),
-            Timestamp(year=2022, month=2, day=24),
-        )
-        expected = {"start": "2022-01-13", "end": "2022-02-24"}
-        actual = period.as_dict()
-        self.assertDictEqual(expected, actual)
-
     def test_generate_datestamps_from_bad_param_type(self):
         period = Period("2022-05-01", "2022-05-05")
         freq = object()
