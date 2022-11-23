@@ -52,15 +52,14 @@ class Budget:
     def from_dict(cls, data: dict) -> "Budget":
         """Creates and returns new Budget instance from dict data."""
 
-        period_data = data["period"]
-        period_start = period_data["start"]
-        period_end = period_data["end"]
+        period_data = data["PERIOD"]
+        period_start = period_data["start_date"]
+        period_end = period_data["end_date"]
 
         result = Budget(period_start, period_end)
 
-        events_data = data["events"]
-        for event in events_data:
-            description = event["description"]
+        events_data = data["EVENTS"]
+        for description, event in events_data.items():
             amount = event["amount"]
             frequency = event["frequency"]
             result.add_event(description, amount, frequency)
@@ -94,8 +93,18 @@ class Budget:
         """Returns dict with the current object's data."""
 
         return {
-            "period": self.period.as_dict(),
-            "events": [event.as_dict() for event in self.events],
+            "PERIOD": {
+                "start_date": self.period.start.date(),
+                "end_date": self.period.end.date(),
+            },
+            "EVENTS": {
+                event.description: {
+                    "amount": event.amount,
+                    "frequency": event.frequency
+                }
+                for event
+                in self.events
+            },
         }
 
     def as_yaml(self) -> str:

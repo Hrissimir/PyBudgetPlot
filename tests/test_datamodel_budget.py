@@ -1,4 +1,5 @@
 """Unit-tests for the `pybudgetplot.definitions.budget` module."""
+from datetime import date
 from pathlib import Path
 from unittest import TestCase
 
@@ -75,34 +76,32 @@ class BudgetTests(TestCase):
 
         # ensure the resulting dict contains string-only data
         expected = {
-            "period": {
-                "start": "2022-01-01",
-                "end": "2022-01-31",
+            "PERIOD": {
+                "start_date": date.fromisoformat("2022-01-01"),
+                "end_date": date.fromisoformat("2022-01-31"),
             },
-            "events": [
-                {
-                    "description": "event desc",
-                    "amount": "23.50",
+            "EVENTS": {
+                "event desc": {
+                    "amount": 23.50,
                     "frequency": "every day",
-                },
-            ],
+                }
+            }
         }
         actual = budget.as_dict()
         self.assertDictEqual(expected, actual)
 
     def test_from_dict(self):
         data = {
-            "period": {
-                "start": "2022-01-01",
-                "end": "2022-01-31",
+            "PERIOD": {
+                "start_date": "2022-01-01",
+                "end_date": "2022-01-31",
             },
-            "events": [
-                {
-                    "description": "event desc",
+            "EVENTS": {
+                "event desc": {
                     "amount": "23.50",
                     "frequency": "every day",
                 },
-            ],
+            }
         }
 
         expected = Budget("2022-01-01", "2022-01-31")
