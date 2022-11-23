@@ -82,13 +82,3 @@ class EventTests(TestCase):
         current = Event("evt desc", 23.5, "every day")
         other = object()
         self.assertFalse(current == other)
-
-    def test_as_dict(self):
-        event = Event("evt desc", 23.5, "every day")
-        expected = {
-            "description": "evt desc",
-            "amount": "23.50",
-            "frequency": "every day",
-        }
-        actual = event.as_dict()
-        self.assertDictEqual(expected, actual)
