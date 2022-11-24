@@ -1,30 +1,29 @@
 """Unit-tests for the `pybudgetplot.definitions.event` module."""
+import datetime
 from unittest import TestCase
 
-from pybudgetplot.datamodel.event import Event, normalize_string, parse_amount
+from pybudgetplot.datamodel.event import Event, parse_amount, parse_string
 
 
-class NormalizeStringTests(TestCase):
-    """Unit-tests for the `normalize_string` method."""
+class ParseStringTests(TestCase):
+    """Unit-tests for the `parse_string` method."""
 
-    def test_given_bad_type_param_then_raises_type_error(self):
+    def test_given_object_then_returns_object_to_string(self):
         value = object()
-        with self.assertRaises(TypeError) as ctx:
-            normalize_string(value)  # noqa
-        expected = (value, str, object)
-        actual = ctx.exception.args
-        self.assertTupleEqual(expected, actual)
+        expected = str(value)
+        actual = parse_string(value)
+        self.assertEqual(expected, actual)
 
     def test_given_string_when_non_whitespace_only_then_returns_normalized(self):
         value = " x \n \t y \r\t"
         expected = "x y"
-        actual = normalize_string(value)
+        actual = parse_string(value)
         self.assertEqual(expected, actual)
 
     def test_given_string_when_whitespace_only_then_raises_value_error(self):
         value = "\n \r \t"
         with self.assertRaises(ValueError) as ctx:
-            normalize_string(value)
+            parse_string(value)
         expected_args = (value,)
         actual_args = ctx.exception.args
         self.assertTupleEqual(expected_args, actual_args)
@@ -69,6 +68,11 @@ class EventTests(TestCase):
         amount_param = "23.5"
         freq_param = "\n \t every day "
         expected = Event("evt desc", 23.5, "every day")
+        actual = Event(desc_param, amount_param, freq_param)
+        self.assertEqual(expected, actual)
+
+        freq_param = datetime.date.fromisoformat("2022-11-13")
+        expected.frequency = freq_param.isoformat()
         actual = Event(desc_param, amount_param, freq_param)
         self.assertEqual(expected, actual)
 

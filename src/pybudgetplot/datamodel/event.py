@@ -1,15 +1,16 @@
 """This module defines the data and logic for processing an event definition."""
 import re
+from typing import Any
 
 REGEX_WS_FLAGS = re.DOTALL | re.IGNORECASE | re.MULTILINE
 REGEX_WS_PATTERN = re.compile(r"\s+", REGEX_WS_FLAGS)
 
 
-def normalize_string(value: str) -> str:
-    """Normalize a string value.
+def parse_string(value: Any) -> str:
+    """Converts a value to string.
 
     Args:
-        value: String containing Event description or frequency.
+        value: Event description or frequency.
 
     Returns:
         Non-empty, stripped string with normalized whitespaces or raises.
@@ -19,13 +20,10 @@ def normalize_string(value: str) -> str:
         ValueError: Raised if the result value is empty string.
     """
 
-    if not isinstance(value, str):
-        raise TypeError(value, str, type(value))
-
-    result = REGEX_WS_PATTERN.sub(" ", value).strip()
+    result = value if isinstance(value, str) else str(value)
+    result = REGEX_WS_PATTERN.sub(" ", result).strip()
     if not result:
         raise ValueError(value)
-
     return result
 
 
@@ -67,9 +65,9 @@ class Event:
             frequency: String describing the frequency of the event occurrences.
         """
 
-        self.description = normalize_string(description)
+        self.description = parse_string(description)
         self.amount = parse_amount(amount)
-        self.frequency = normalize_string(frequency)
+        self.frequency = parse_string(frequency)
 
     def __repr__(self) -> str:
         return "%s(description=%r, amount=%r, frequency=%r)" % (
